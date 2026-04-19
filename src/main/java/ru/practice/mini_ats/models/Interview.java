@@ -3,6 +3,8 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import ru.practice.mini_ats.models.enums.InterviewStatus;
+import ru.practice.mini_ats.models.enums.InterviewType;
 
 import java.time.LocalDate;
 
@@ -20,10 +22,12 @@ public class Interview {
     private LocalDate date;
 
     @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private InterviewType type;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private InterviewStatus status;
 
     @Column(name = "feedback")
     private String feedback;
