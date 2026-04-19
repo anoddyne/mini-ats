@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import ru.practice.mini_ats.models.enums.EmploymentType;
+import ru.practice.mini_ats.models.enums.VacancyStatus;
 
 import java.util.Map;
 
@@ -33,11 +35,13 @@ public class Vacancy {
     @Column(name = "location")
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "employment_type")
-    private String employmentType;
+    private EmploymentType employmentType;
 
-    @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private VacancyStatus status;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "required_skills", columnDefinition = "jsonb")
