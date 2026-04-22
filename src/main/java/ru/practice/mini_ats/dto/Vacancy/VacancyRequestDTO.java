@@ -3,7 +3,6 @@ package ru.practice.mini_ats.dto.Vacancy;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import ru.practice.mini_ats.models.Company;
 import ru.practice.mini_ats.models.enums.EmploymentType;
 import ru.practice.mini_ats.models.enums.VacancyStatus;
 

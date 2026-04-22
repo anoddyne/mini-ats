@@ -51,4 +51,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private UserRole role;
+
+    @Transient
+    public String getFullName() {
+        return String.format("%s %s %s",
+                surname != null ? surname : "",
+                name != null ? name : "",
+                patronymic != null ? patronymic : ""
+                ).trim().replaceAll("\\s+", " ");
+    }
 }
