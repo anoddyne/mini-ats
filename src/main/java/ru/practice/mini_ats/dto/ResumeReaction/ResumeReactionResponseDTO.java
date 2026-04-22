@@ -9,7 +9,6 @@ public record ResumeReactionResponseDTO(
         Integer vacancyId,
         String vacancyTitle,
         Integer resumeId,
-        String resumeTitle,
         String candidateFullName
 ) {
 }
