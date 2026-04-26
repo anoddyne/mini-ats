@@ -238,7 +238,6 @@ public class UserRepositoryTest {
         assertThat(updated.getSurname()).isEqualTo("NewSurname");
     }
 
-    // Дополнительный тест: поиск по имени и фамилии (если метод существует в репозитории)
     @Test
     void findUserByNameAndSurname() {
         User user = new User();
