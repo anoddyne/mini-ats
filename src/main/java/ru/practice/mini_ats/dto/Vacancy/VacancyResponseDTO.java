@@ -16,6 +16,7 @@ public record VacancyResponseDTO(
         VacancyStatus status,
         Map<String, Object> requiredSkills,
         Integer experienceLevel,
+        Integer companyId,
         String companyName
 ) {
 }
