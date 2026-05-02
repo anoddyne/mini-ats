@@ -4,6 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.practice.mini_ats.models.ResumeReaction;
 
+import java.util.List;
+
 @Repository
 public interface ResumeReactionRepository extends JpaRepository<ResumeReaction, Integer> {
+    boolean existsByVacancyVacancyIdAndResumeResumeId(Integer vacancyId, Integer resumeId);
+    List<ResumeReaction> findByVacancyVacancyId(Integer vacancyId);
+    List<ResumeReaction> findAllByResumeResumeId(Integer resumeId);
 }

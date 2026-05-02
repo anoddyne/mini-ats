@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 import org.hibernate.type.SqlTypes;
 import ru.practice.mini_ats.models.enums.EmploymentType;
 import ru.practice.mini_ats.models.enums.VacancyStatus;
@@ -14,6 +16,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Table(name = "vacancies")
+@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class Vacancy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

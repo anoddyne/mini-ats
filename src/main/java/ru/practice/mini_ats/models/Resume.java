@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Table(name = "resume")
+@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class Resume {
     @Id
     @Column(name = "resume_id")
