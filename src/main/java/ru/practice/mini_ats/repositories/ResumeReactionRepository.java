@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ResumeReactionRepository extends JpaRepository<ResumeReaction, Integer> {
-    List<ResumeReaction> findByResume_ResumeId(Integer resumeId);
-
-    List<ResumeReaction> findByVacancy_VacancyId(Integer vacancyId);
+    boolean existsByVacancyVacancyIdAndResumeResumeId(Integer vacancyId, Integer resumeId);
+    List<ResumeReaction> findByVacancyVacancyId(Integer vacancyId);
+    List<ResumeReaction> findAllByResumeResumeId(Integer resumeId);
 }

@@ -3,6 +3,8 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 import ru.practice.mini_ats.models.enums.InterviewStatus;
 import ru.practice.mini_ats.models.enums.InterviewType;
 
@@ -12,6 +14,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "interviews")
+@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class Interview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

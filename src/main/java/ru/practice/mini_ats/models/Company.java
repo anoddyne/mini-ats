@@ -4,11 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "companies")
+@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class Company {
 
     @Id
