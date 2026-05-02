@@ -7,11 +7,8 @@ import ru.practice.mini_ats.models.enums.InterviewStatus;
 
 import java.util.List;
 
-import java.util.List;
-
 @Repository
 public interface InterviewRepository extends JpaRepository<Interview, Integer> {
-    List<Interview> findAllByResumeReactionVacancyCompanyCompanyId(Integer companyId);
     List<Interview> findByResumeReaction_ResumeReactionId(Integer resumeReactionId);
 
     List<Interview> findByStatus(InterviewStatus interviewStatus);

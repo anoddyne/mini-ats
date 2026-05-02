@@ -3,8 +3,6 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
 
 import java.time.LocalDate;
 
@@ -12,7 +10,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(name="resume_reactions")
-@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class ResumeReaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

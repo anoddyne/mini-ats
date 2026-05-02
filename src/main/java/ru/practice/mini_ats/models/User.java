@@ -6,15 +6,12 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
 import ru.practice.mini_ats.models.enums.UserRole;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "users")
-@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
