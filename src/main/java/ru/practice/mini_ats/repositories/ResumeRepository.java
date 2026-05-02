@@ -7,9 +7,12 @@ import ru.practice.mini_ats.models.Resume;
 
 import java.util.Optional;
 
+import java.util.List;
+
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Integer> {
     boolean existsByUserUserId(Integer userId);
 
     Optional<Resume> findByUserUserId(Integer userId);
+    List<Resume> findByUser_UserId(Integer userId);
 }

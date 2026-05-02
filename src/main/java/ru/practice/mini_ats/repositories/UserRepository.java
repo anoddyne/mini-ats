@@ -12,4 +12,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByLogin(@NotBlank(message = "Логин не может быть пустым") @Size(min = 3, max = 50, message = "Длина логина должна быть от 3 до 30 символов") String login);
 
     boolean existsByEmail(@Email(message = "Неверный формат почты") @NotBlank(message = "Необходимо указать электронную почту") String email);
+    User findUserByLogin(@NotBlank String login);
+
+    User findUserByEmail(@Email @NotBlank String email);
+
+    User findUserByLoginAndPassword(@NotBlank String login, @NotBlank String password);
+
+    void deleteUserByLogin(@NotBlank String login);
+
+    void deleteUserByEmail(@Email @NotBlank String email);
+
+    User findUserByNameAndSurname(@NotBlank String name, @NotBlank String surname);
 }
