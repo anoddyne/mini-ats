@@ -34,7 +34,7 @@ public class VacancyService {
 
     @Transactional(readOnly = true)
     public List<VacancyResponseDTO> getAllActive() {
-        return vacancyRepository.findAllByStatus(VacancyStatus.OPEN).stream().map(vacancyMapper::toResponseDto).toList();
+        return vacancyRepository.findByStatus(VacancyStatus.OPEN).stream().map(vacancyMapper::toResponseDto).toList();
     }
 
     @Transactional(readOnly = true)

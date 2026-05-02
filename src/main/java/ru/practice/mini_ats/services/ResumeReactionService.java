@@ -51,7 +51,7 @@ public class ResumeReactionService {
     @Transactional(readOnly = true)
     public List<ResumeReactionResponseDTO> getReactionsForVacancy(Integer vacancyId) {
         // Метод для рекрутера, чтобы посмотреть все отклики на его вакансию
-        return resumeReactionRepository.findByVacancyVacancyId(vacancyId)
+        return resumeReactionRepository.findByVacancy_VacancyId(vacancyId)
                 .stream()
                 .map(resumeReactionMapper::toResponseDto)
                 .toList();
@@ -60,7 +60,7 @@ public class ResumeReactionService {
     @Transactional(readOnly = true)
     public List<ResumeReactionResponseDTO> getMyReactions(Integer resumeId) {
         // Метод для кандидата, чтобы посмотреть, куда он откликался
-        return resumeReactionRepository.findAllByResumeResumeId(resumeId)
+        return resumeReactionRepository.findByResume_ResumeId(resumeId)
                 .stream()
                 .map(resumeReactionMapper::toResponseDto)
                 .toList();

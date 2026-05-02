@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface VacancyRepository extends JpaRepository<Vacancy, Integer> {
-    List<Vacancy> findAllByStatus(VacancyStatus vacancyStatus);
     Vacancy findByTitle(String title);
 
     void deleteByTitle(String title);
