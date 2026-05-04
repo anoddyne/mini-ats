@@ -4,6 +4,7 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SoftDelete;
@@ -14,7 +15,6 @@ import ru.practice.mini_ats.models.enums.UserRole;
 @Getter
 @Setter
 @Table(name = "users")
-@SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +54,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private UserRole role;
+
+    @SoftDelete(columnName = "active", strategy = SoftDeleteType.ACTIVE)
+    @NotNull
+    private boolean active;
 
     @Transient
     public String getFullName() {

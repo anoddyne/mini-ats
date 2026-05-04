@@ -2,6 +2,7 @@ package ru.practice.mini_ats.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practice.mini_ats.dto.User.UserRequestDTO;
@@ -18,17 +19,17 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponseDTO createUser(UserRequestDTO dto) {
-        if (userRepository.existsByLogin(dto.login()) || userRepository.existsByEmail(dto.email())) {
+        if (userRepository.existsByLogin(dto.login()) && userRepository.existsByEmail(dto.email())) {
             throw new RuntimeException("Пользователь с таким логином или почтой уже существует");
         }
         User user = userMapper.toEntity(dto);
         user.setRole(UserRole.CANDIDATE);
-
-        // в будущем шифрование пароля
-        // user.setPassword();
+        user.setActive(true);
+        user.setPassword(passwordEncoder.encode(dto.password()));
 
         return userMapper.toResponseDto(userRepository.save(user));
     }
