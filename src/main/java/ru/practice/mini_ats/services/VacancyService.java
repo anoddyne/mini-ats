@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practice.mini_ats.dto.Company.CompanyResponseDTO;
 import ru.practice.mini_ats.dto.Vacancy.VacancyRequestDTO;
 import ru.practice.mini_ats.dto.Vacancy.VacancyResponseDTO;
 import ru.practice.mini_ats.mapper.VacancyMapper;
@@ -33,8 +32,8 @@ public class VacancyService {
     }
 
     @Transactional(readOnly = true)
-    public List<VacancyResponseDTO> getAllActive() {
-        return vacancyRepository.findByStatus(VacancyStatus.OPEN).stream().map(vacancyMapper::toResponseDto).toList();
+    public List<VacancyResponseDTO> getByStatus(VacancyStatus status) {
+        return vacancyRepository.findByStatus(status).stream().map(vacancyMapper::toResponseDto).toList();
     }
 
     @Transactional(readOnly = true)
@@ -56,7 +55,6 @@ public class VacancyService {
         vacancy.setStatus(VacancyStatus.CLOSED);
         vacancyRepository.save(vacancy);
     }
-
 
     @Transactional
     public void deleteVacancy(Integer id) {
