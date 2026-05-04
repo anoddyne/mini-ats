@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practice.mini_ats.dto.Company.CompanyRequestDTO;
 import ru.practice.mini_ats.dto.Company.CompanyResponseDTO;
 import ru.practice.mini_ats.services.CompanyService;
-import ru.practice.mini_ats.services.VacancyService;
 
 import java.util.List;
 
