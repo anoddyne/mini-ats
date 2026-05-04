@@ -38,7 +38,7 @@ public class InterviewService {
     @Transactional
     public InterviewResponseDTO addFeedback(Integer interviewId, InterviewFeedbackDTO dto) {
         Interview interview = interviewRepository.findById(interviewId).orElseThrow(() -> new EntityNotFoundException("Интервью не найдено"));
-        interviewMapper.toResponseDto(interview);
+        interviewMapper.updateEntityFromFeedback(dto, interview);
         return interviewMapper.toResponseDto(interviewRepository.save(interview));
     }
 
