@@ -73,4 +73,10 @@ public class UserService {
         User updatedUser = userRepository.save(user);
         return userMapper.toResponseDto(updatedUser);
     }
+
+    @Transactional
+    public UserResponseDTO getUserByLogin(String login) {
+        User user = userRepository.findUserByLogin(login);
+        return userMapper.toResponseDto(user);
+    }
 }

@@ -25,7 +25,7 @@ public class ResumeController {
         return new ResponseEntity<>(resumeService.createResume(dto, userId), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Получить резюме по id")
+    @Operation(summary = "Получить резюме по id пользователя")
     @GetMapping("/{id}")
     public ResponseEntity<ResumeResponseDTO> getResumeById(@PathVariable Integer id) {
         return ResponseEntity.ok(resumeService.getByUserId(id));

@@ -5,6 +5,7 @@ import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import CandidateDashboard from '../pages/candidate/CandidateDashboard';
+import ProfilePage from "../pages/ProfilePage.jsx";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function AppRouter() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path ="/profile" element={< ProfilePage />}/>
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/candidate/dashboard" element={
               <ProtectedRoute><CandidateDashboard /></ProtectedRoute>
