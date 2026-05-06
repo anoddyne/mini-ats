@@ -2,6 +2,7 @@ package ru.practice.mini_ats.controllers;
 
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,13 +26,12 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody @NonNull LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password()));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        assert userDetails != null;
         String jwt = jwtUtils.generateToken(userDetails);
         return ResponseEntity.ok(Map.of("token", jwt));
     }
-
-
 }
 

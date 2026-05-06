@@ -1,8 +1,6 @@
 package ru.practice.mini_ats.security;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
