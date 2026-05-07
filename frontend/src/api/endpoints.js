@@ -1,10 +1,9 @@
 import apiClient from './client';
 
 export const authAPI = {
-  register: (data) => apiClient.post('/auth/register', data),
+  register: (data) => apiClient.post('/users/register', data),
   login: (data) => apiClient.post('/auth/login', data),
-  getCurrentUser: () => apiClient.get('/auth/me'),
-  updateProfile: (data) => apiClient.put('/auth/profile', data),
+  updateProfile:(userId,updateData) => apiClient.put(`/users/${userId}`,updateData),
 };
 
 export const vacancyAPI = {
@@ -18,21 +17,13 @@ export const vacancyAPI = {
 };
 
 export const applicationAPI = {
-  getMyApplications: () => apiClient.get('/applications/my'),
-  getByVacancy: (vacancyId) => apiClient.get('/applications/vacancy/${vacancyId}'),
-  create: (vacancyId, data) => apiClient.post('/applications/vacancy/${vacancyId}', data),
-  updateStatus: (applicationId, status) => apiClient.patch('/applications/${applicationId}/status', { status }),
-  updateInterviewType: (applicationId, interviewType) => apiClient.patch('/applications/${applicationId}/interview-type', { interviewType }),
-  cancel: (applicationId) => apiClient.delete('/applications/${applicationId}'),
+  getMyApplications: () => apiClient.get('reactions/'), // TODO
+  create: (vacancyId, data) => apiClient.post(`/applications/vacancies/${vacancyId}`, data),
 };
 
 export const resumeAPI = {
-  getMyResume: () => apiClient.get('/resumes/my'),
-  upload: (formData) => apiClient.post('/resumes/upload', formData, {
+  upload: (formData) => apiClient.post('/resume', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
-};
-
-export const statsAPI = {
-  getRecruiterStats: () => apiClient.get('/stats/recruiter'),
+  getMyResume: (userId) => apiClient.get(`/resume/${userId}`),
 };
