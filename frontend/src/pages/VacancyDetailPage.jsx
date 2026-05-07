@@ -14,6 +14,26 @@ export default function VacancyDetailPage() {
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
 
+  const getEmploymentTypeLabel = (type) => {
+    switch (type) {
+      case 'OFFICE': return 'Офис';
+      case 'HYBRID': return 'Гибрид';
+      case 'REMOTE': return 'Удалённая работа';
+      case 'ON_SITE': return 'На объекте';
+      default: return type || 'Не указан';
+    }
+  };
+
+  const getVacancyStatusLabel = (status) => {
+    switch (status) {
+      case 'OPEN': return { text: 'Открыта', color: 'text-green-600' };
+      case 'CLOSED': return { text: 'Закрыта', color: 'text-red-600' };
+      case 'DRAFT': return { text: 'Черновик', color: 'text-gray-500' };
+      case 'ARCHIVED': return { text: 'В архиве', color: 'text-purple-600' };
+      default: return null;
+    }
+  };
+
   useEffect(() => {
     loadVacancy();
   }, [id]);
@@ -53,16 +73,25 @@ export default function VacancyDetailPage() {
   if (loading) return <div className="flex justify-center py-12">Загрузка...</div>;
   if (!vacancy) return <div className="text-center py-12">Вакансия не найдена</div>;
 
+  const statusInfo = getVacancyStatusLabel(vacancy.status);
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-900">{vacancy.title}</h1>
+          <div className="flex justify-between items-start">
+            <h1 className="text-2xl font-bold text-gray-900">{vacancy.title}</h1>
+            {statusInfo && (
+              <span className={`text-sm font-medium ${statusInfo.color}`}>
+                {statusInfo.text}
+              </span>
+            )}
+          </div>
           
           <div className="flex flex-wrap gap-2 mt-2 text-sm text-gray-500">
-            <span>{vacancy.location}</span>
+            <span>{vacancy.location || 'Локация не указана'}</span>
             <span>•</span>
-            <span>{vacancy.employmentType}</span>
+            <span>{getEmploymentTypeLabel(vacancy.employmentType)}</span>
             {vacancy.salaryFrom && (
               <>
                 <span>•</span>
@@ -89,10 +118,16 @@ export default function VacancyDetailPage() {
 
           <div className="mt-4">
             <h3 className="font-semibold text-lg">Опыт работы</h3>
-            <p className="text-gray-700">{vacancy.experienceLevel || 'Не указан'}</p>
+            <p className="text-gray-700">
+              {vacancy.experienceLevel === 'NO_EXPERIENCE' ? 'Нет опыта' :
+               vacancy.experienceLevel === 'JUNIOR' ? 'Junior (до 1 года)' :
+               vacancy.experienceLevel === 'MIDDLE' ? 'Middle (1-3 года)' :
+               vacancy.experienceLevel === 'SENIOR' ? 'Senior (3-6 лет)' :
+               vacancy.experienceLevel === 'LEAD' ? 'Lead (6+ лет)' : 'Не указан'}
+            </p>
           </div>
 
-          {/* Кнопка отклика */}
+          {/* Кнопка отклика - только для OPEN */}
           {user?.role === 'CANDIDATE' && vacancy.status === 'OPEN' && !alreadyApplied && (
             <div className="mt-6">
               {!showApplyForm ? (
@@ -132,7 +167,8 @@ export default function VacancyDetailPage() {
             </div>
           )}
 
-          {user?.role === 'RECRUITER' && vacancy.status === 'OPEN' && (
+          {/* Кнопки рекрутера - для DRAFT и OPEN */}
+          {user?.role === 'RECRUITER' && (vacancy.status === 'OPEN' || vacancy.status === 'DRAFT') && (
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => navigate(`/recruiter/vacancies/${vacancy.id}/edit`)}
@@ -140,17 +176,19 @@ export default function VacancyDetailPage() {
               >
                 Редактировать
               </button>
-              <button
-                onClick={async () => {
-                  if (confirm('Закрыть вакансию?')) {
-                    await vacancyAPI.close(vacancy.id);
-                    loadVacancy();
-                  }
-                }}
-                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-              >
-                Закрыть вакансию
-              </button>
+              {vacancy.status === 'OPEN' && (
+                <button
+                  onClick={async () => {
+                    if (confirm('Закрыть вакансию?')) {
+                      await vacancyAPI.close(vacancy.id);
+                      loadVacancy();
+                    }
+                  }}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                >
+                  Закрыть вакансию
+                </button>
+              )}
             </div>
           )}
         </div>

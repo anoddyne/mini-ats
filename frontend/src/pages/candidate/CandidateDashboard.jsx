@@ -9,6 +9,31 @@ export default function CandidateDashboard() {
   const [uploading, setUploading] = useState(false);
   const [stats, setStats] = useState({ total: 0, byStatus: {} });
 
+  // Цвета и названия для статусов (включая статусы собеседований)
+  const statusColors = {
+    NEW: 'bg-yellow-100 text-yellow-800',
+    REVIEW: 'bg-blue-100 text-blue-800',
+    INTERVIEW: 'bg-purple-100 text-purple-800',
+    SCHEDULED: 'bg-indigo-100 text-indigo-800',
+    COMPLETED: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+    POSTPONED: 'bg-orange-100 text-orange-800',
+    OFFER: 'bg-emerald-100 text-emerald-800',
+    REJECT: 'bg-gray-100 text-gray-800',
+  };
+
+  const statusNames = {
+    NEW: 'Новый',
+    REVIEW: 'На рассмотрении',
+    INTERVIEW: 'Собеседование',
+    SCHEDULED: 'Запланировано',
+    COMPLETED: 'Завершено',
+    CANCELLED: 'Отменено',
+    POSTPONED: 'Отложено',
+    OFFER: 'Оффер',
+    REJECT: 'Отказ',
+  };
+
   useEffect(() => {
     loadData();
   }, []);
@@ -77,22 +102,6 @@ export default function CandidateDashboard() {
     }
   };
 
-  const statusColors = {
-    NEW: 'bg-yellow-100 text-yellow-800',
-    REVIEW: 'bg-blue-100 text-blue-800',
-    INTERVIEW: 'bg-purple-100 text-purple-800',
-    OFFER: 'bg-green-100 text-green-800',
-    REJECT: 'bg-red-100 text-red-800',
-  };
-
-  const statusNames = {
-    NEW: 'Новый',
-    REVIEW: 'На рассмотрении',
-    INTERVIEW: 'Собеседование',
-    OFFER: 'Оффер',
-    REJECT: 'Отказ',
-  };
-
   if (loading) return <div className="text-center py-12">Загрузка...</div>;
 
   return (
@@ -105,24 +114,26 @@ export default function CandidateDashboard() {
       </div>
 
       {/* Статистика */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white p-4 rounded-lg shadow text-center">
-          <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-          <div className="text-sm text-gray-500">Всего откликов</div>
-        </div>
-        {Object.entries(stats.byStatus).map(([status, count]) => (
-          <div key={status} className="bg-white p-4 rounded-lg shadow text-center">
-            <div className="text-2xl font-bold text-blue-600">{count}</div>
-            <div className="text-sm text-gray-500">{statusNames[status] || status}</div>
+      {stats.total > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-8">
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+            <div className="text-sm text-gray-500">Всего откликов</div>
           </div>
-        ))}
-      </div>
+          {Object.entries(stats.byStatus).map(([status, count]) => (
+            <div key={status} className="bg-white p-4 rounded-lg shadow text-center">
+              <div className="text-2xl font-bold text-blue-600">{count}</div>
+              <div className="text-sm text-gray-500">{statusNames[status] || status}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Резюме */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">📄 Моё резюме</h2>
         {resume ? (
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center flex-wrap gap-3">
             <div>
               <p className="text-green-600">✓ Резюме загружено</p>
               <a 
@@ -196,6 +207,15 @@ export default function CandidateDashboard() {
                     {app.coverLetter && (
                       <p className="text-sm text-gray-600 mt-2 italic">
                         "{app.coverLetter}"
+                      </p>
+                    )}
+                    {app.status === 'SCHEDULED' && app.interviewType && (
+                      <p className="text-sm text-indigo-600 mt-2">
+                        📅 Тип собеседования: {
+                          app.interviewType === 'TECHNICAL' ? 'Техническое' :
+                          app.interviewType === 'HR' ? 'HR' :
+                          app.interviewType === 'FINAL' ? 'Финальное' : 'Проверка задания'
+                        }
                       </p>
                     )}
                   </div>

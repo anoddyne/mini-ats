@@ -10,6 +10,60 @@ export default function RecruiterDashboard() {
   const [applications, setApplications] = useState([]);
   const [applicationsLoading, setApplicationsLoading] = useState(false);
 
+  // Функция для преобразования типа занятости
+  const getEmploymentTypeLabel = (type) => {
+    switch (type) {
+      case 'OFFICE': return 'Офис';
+      case 'HYBRID': return 'Гибрид';
+      case 'REMOTE': return 'Удалённо';
+      case 'ON_SITE': return 'На объекте';
+      default: return type || 'Не указан';
+    }
+  };
+
+  // Функция для статуса вакансии
+  const getVacancyStatusLabel = (status) => {
+    switch (status) {
+      case 'DRAFT': return { text: 'Черновик', color: 'bg-gray-100 text-gray-800' };
+      case 'OPEN': return { text: 'Открыта', color: 'bg-green-100 text-green-800' };
+      case 'CLOSED': return { text: 'Закрыта', color: 'bg-red-100 text-red-800' };
+      case 'ARCHIVED': return { text: 'В архиве', color: 'bg-purple-100 text-purple-800' };
+      default: return { text: status || 'Неизвестно', color: 'bg-gray-100 text-gray-800' };
+    }
+  };
+
+  // Цвета и названия для статусов откликов
+  const statusColors = {
+    NEW: 'bg-yellow-100 text-yellow-800',
+    REVIEW: 'bg-blue-100 text-blue-800',
+    INTERVIEW: 'bg-purple-100 text-purple-800',
+    SCHEDULED: 'bg-indigo-100 text-indigo-800',
+    COMPLETED: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+    POSTPONED: 'bg-orange-100 text-orange-800',
+    OFFER: 'bg-emerald-100 text-emerald-800',
+    REJECT: 'bg-gray-100 text-gray-800',
+  };
+
+  const statusNames = {
+    NEW: 'Новый',
+    REVIEW: 'На рассмотрении',
+    INTERVIEW: 'Собеседование',
+    SCHEDULED: 'Запланировано',
+    COMPLETED: 'Завершено',
+    CANCELLED: 'Отменено',
+    POSTPONED: 'Отложено',
+    OFFER: 'Оффер',
+    REJECT: 'Отказ',
+  };
+
+  const interviewTypes = [
+    { value: 'TECHNICAL', label: '🛠 Техническое' },
+    { value: 'HR', label: '💬 HR собеседование' },
+    { value: 'FINAL', label: '🎯 Финальное' },
+    { value: 'TASK_REVIEW', label: '📋 Проверка задания' },
+  ];
+
   useEffect(() => {
     loadData();
   }, []);
@@ -47,10 +101,20 @@ export default function RecruiterDashboard() {
     try {
       await applicationAPI.updateStatus(applicationId, newStatus);
       await loadApplications(selectedVacancy);
-      await loadData(); // Обновляем статистику
+      await loadData();
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
       alert('Ошибка обновления статуса');
+    }
+  };
+
+  const updateInterviewType = async (applicationId, interviewType) => {
+    try {
+      await applicationAPI.updateInterviewType(applicationId, interviewType);
+      await loadApplications(selectedVacancy);
+    } catch (error) {
+      console.error('Ошибка обновления типа собеседования:', error);
+      alert('Ошибка обновления типа собеседования');
     }
   };
 
@@ -69,30 +133,15 @@ export default function RecruiterDashboard() {
     }
   };
 
-  const statusColors = {
-    NEW: 'bg-yellow-100 text-yellow-800',
-    REVIEW: 'bg-blue-100 text-blue-800',
-    INTERVIEW: 'bg-purple-100 text-purple-800',
-    OFFER: 'bg-green-100 text-green-800',
-    REJECT: 'bg-red-100 text-red-800',
-  };
-
-  const statusNames = {
-    NEW: 'Новый',
-    REVIEW: 'На рассмотрении',
-    INTERVIEW: 'Собеседование',
-    OFFER: 'Оффер',
-    REJECT: 'Отказ',
-  };
-
-  // Статистические карточки
   const statsCards = stats ? [
     { label: 'Всего откликов', value: stats.total, color: 'bg-blue-500', icon: '📊' },
     { label: 'Новых', value: stats.byStatus?.NEW || 0, color: 'bg-yellow-500', icon: '🆕' },
     { label: 'На рассмотрении', value: stats.byStatus?.REVIEW || 0, color: 'bg-blue-500', icon: '👀' },
     { label: 'Собеседование', value: stats.byStatus?.INTERVIEW || 0, color: 'bg-purple-500', icon: '🎯' },
-    { label: 'Оффер', value: stats.byStatus?.OFFER || 0, color: 'bg-green-500', icon: '✅' },
-    { label: 'Отказ', value: stats.byStatus?.REJECT || 0, color: 'bg-red-500', icon: '❌' },
+    { label: 'Запланировано', value: stats.byStatus?.SCHEDULED || 0, color: 'bg-indigo-500', icon: '📅' },
+    { label: 'Завершено', value: stats.byStatus?.COMPLETED || 0, color: 'bg-green-500', icon: '✅' },
+    { label: 'Оффер', value: stats.byStatus?.OFFER || 0, color: 'bg-emerald-500', icon: '🎉' },
+    { label: 'Отказ', value: stats.byStatus?.REJECT || 0, color: 'bg-gray-500', icon: '❌' },
   ] : [];
 
   if (loading) return <div className="text-center py-12">Загрузка...</div>;
@@ -114,26 +163,24 @@ export default function RecruiterDashboard() {
         </div>
       </div>
 
-      {/* ========== СТАТИСТИКА (НОВЫЙ БЛОК) ========== */}
       {stats && stats.total > 0 && (
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-4">📈 Статистика откликов</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             {statsCards.map((card, index) => (
               <div
                 key={index}
-                className={`${card.color} rounded-lg shadow p-4 text-white transform hover:scale-105 transition-transform duration-200`}
+                className={`${card.color} rounded-lg shadow p-3 text-white transform hover:scale-105 transition-transform duration-200`}
               >
-                <div className="text-3xl mb-2">{card.icon}</div>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <div className="text-sm opacity-90">{card.label}</div>
+                <div className="text-2xl mb-1">{card.icon}</div>
+                <div className="text-xl font-bold">{card.value}</div>
+                <div className="text-xs opacity-90">{card.label}</div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Если статистика пустая, показываем заглушку */}
       {stats && stats.total === 0 && (
         <div className="bg-gray-50 rounded-lg p-6 text-center mb-8">
           <p className="text-gray-500">📊 Пока нет откликов на ваши вакансии</p>
@@ -153,58 +200,57 @@ export default function RecruiterDashboard() {
             </div>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {myVacancies.map((vacancy) => (
-                <div
-                  key={vacancy.id}
-                  className={`p-4 border rounded-lg cursor-pointer transition ${
-                    selectedVacancy === vacancy.id ? 'border-blue-600 bg-blue-50' : 'hover:border-blue-300'
-                  }`}
-                  onClick={() => loadApplications(vacancy.id)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{vacancy.title}</h3>
-                      <p className="text-sm text-gray-500">
-                        {vacancy.location || 'Локация не указана'} • {vacancy.employmentType === 'FULL_TIME' ? 'Полная занятость' :
-                          vacancy.employmentType === 'PART_TIME' ? 'Частичная занятость' :
-                          vacancy.employmentType === 'REMOTE' ? 'Удалённо' : 'Стажировка'}
-                      </p>
-                      <div className="flex gap-2 mt-2">
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          vacancy.status === 'OPEN' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {vacancy.status === 'OPEN' ? 'Открыта' : 'Закрыта'}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          📊 {vacancy.applicationsCount || 0} откликов
-                        </span>
+              {myVacancies.map((vacancy) => {
+                const statusInfo = getVacancyStatusLabel(vacancy.status);
+                return (
+                  <div
+                    key={vacancy.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition ${
+                      selectedVacancy === vacancy.id ? 'border-blue-600 bg-blue-50' : 'hover:border-blue-300'
+                    }`}
+                    onClick={() => loadApplications(vacancy.id)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{vacancy.title}</h3>
+                        <p className="text-sm text-gray-500">
+                          {vacancy.location || 'Локация не указана'} • {getEmploymentTypeLabel(vacancy.employmentType)}
+                        </p>
+                        <div className="flex gap-2 mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${statusInfo.color}`}>
+                            {statusInfo.text}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            📊 {vacancy.applicationsCount || 0} откликов
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Link
+                          to={`/recruiter/vacancies/${vacancy.id}/edit`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-yellow-600 hover:text-yellow-700 text-sm"
+                          title="Редактировать"
+                        >
+                          ✏️
+                        </Link>
+                        {(vacancy.status === 'OPEN' || vacancy.status === 'DRAFT') && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              closeVacancy(vacancy.id);
+                            }}
+                            className="text-red-600 hover:text-red-700 text-sm"
+                            title="Закрыть вакансию"
+                          >
+                            🔒
+                          </button>
+                        )}
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/recruiter/vacancies/${vacancy.id}/edit`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-yellow-600 hover:text-yellow-700 text-sm"
-                        title="Редактировать"
-                      >
-                        ✏️
-                      </Link>
-                      {vacancy.status === 'OPEN' && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            closeVacancy(vacancy.id);
-                          }}
-                          className="text-red-600 hover:text-red-700 text-sm"
-                          title="Закрыть вакансию"
-                        >
-                          🔒
-                        </button>
-                      )}
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -248,6 +294,21 @@ export default function RecruiterDashboard() {
                               📄 Скачать резюме
                             </a>
                           )}
+                          
+                          {app.status === 'SCHEDULED' && (
+                            <div className="mt-3">
+                              <label className="text-xs text-gray-500 mr-2">Тип собеседования:</label>
+                              <select
+                                value={app.interviewType || 'TECHNICAL'}
+                                onChange={(e) => updateInterviewType(app.id, e.target.value)}
+                                className="text-sm border border-gray-300 rounded-md p-1"
+                              >
+                                {interviewTypes.map(type => (
+                                  <option key={type.value} value={type.value}>{type.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
                         </div>
                         <div>
                           <select
@@ -258,6 +319,10 @@ export default function RecruiterDashboard() {
                             <option value="NEW">🟡 Новый</option>
                             <option value="REVIEW">🔵 На рассмотрении</option>
                             <option value="INTERVIEW">🟣 Собеседование</option>
+                            <option value="SCHEDULED">📅 Запланировано</option>
+                            <option value="COMPLETED">✅ Завершено</option>
+                            <option value="CANCELLED">❌ Отменено</option>
+                            <option value="POSTPONED">⏰ Отложено</option>
                             <option value="OFFER">🟢 Оффер</option>
                             <option value="REJECT">🔴 Отказ</option>
                           </select>

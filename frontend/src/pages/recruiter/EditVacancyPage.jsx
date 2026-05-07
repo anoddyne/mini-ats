@@ -13,7 +13,8 @@ export default function EditVacancyPage() {
     salaryFrom: '',
     salaryTo: '',
     location: '',
-    employmentType: 'FULL_TIME',
+    employmentType: 'OFFICE',
+    status: 'DRAFT',
     requiredSkills: '',
     experienceLevel: 'NO_EXPERIENCE',
   });
@@ -32,7 +33,8 @@ export default function EditVacancyPage() {
         salaryFrom: v.salaryFrom || '',
         salaryTo: v.salaryTo || '',
         location: v.location || '',
-        employmentType: v.employmentType || 'FULL_TIME',
+        employmentType: v.employmentType || 'OFFICE',
+        status: v.status || 'DRAFT',
         requiredSkills: v.requiredSkills || '',
         experienceLevel: v.experienceLevel || 'NO_EXPERIENCE',
       });
@@ -136,10 +138,25 @@ export default function EditVacancyPage() {
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-md p-2"
             >
-              <option value="FULL_TIME">Полная занятость</option>
-              <option value="PART_TIME">Частичная занятость</option>
+              <option value="OFFICE">Офис</option>
+              <option value="HYBRID">Гибрид</option>
               <option value="REMOTE">Удалённая работа</option>
-              <option value="INTERNSHIP">Стажировка</option>
+              <option value="ON_SITE">На объекте</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Статус вакансии</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-2"
+            >
+              <option value="DRAFT">📝 Черновик</option>
+              <option value="OPEN">🟢 Открыта</option>
+              <option value="CLOSED">🔴 Закрыта</option>
+              <option value="ARCHIVED">📦 В архиве</option>
             </select>
           </div>
 

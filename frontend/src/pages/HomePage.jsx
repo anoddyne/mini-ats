@@ -8,7 +8,6 @@ export default function HomePage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   
-  // Параметры пагинации и фильтрации
   const [filters, setFilters] = useState({
     page: 0,
     size: 10,
@@ -16,20 +15,14 @@ export default function HomePage() {
     direction: 'DESC',
   });
   
-  // Текстовый поиск
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Фильтры
   const [employmentType, setEmploymentType] = useState('');
   const [location, setLocation] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
   const [salaryMin, setSalaryMin] = useState('');
   const [salaryMax, setSalaryMax] = useState('');
-  
-  // Показывать ли панель фильтров (на мобильных)
   const [showFilters, setShowFilters] = useState(false);
 
-  // Загрузка вакансий
   useEffect(() => {
     loadVacancies();
   }, [filters]);
@@ -37,9 +30,7 @@ export default function HomePage() {
   const loadVacancies = async () => {
     setLoading(true);
     try {
-      // Собираем все параметры для запроса
       const params = { ...filters };
-      
       if (searchQuery) params.title = searchQuery;
       if (employmentType) params.employmentType = employmentType;
       if (location) params.location = location;
@@ -61,14 +52,12 @@ export default function HomePage() {
     }
   };
 
-  // Поиск (сбрасываем на первую страницу)
   const handleSearch = (e) => {
     e.preventDefault();
     setFilters({ ...filters, page: 0 });
     setTimeout(() => loadVacancies(), 0);
   };
 
-  // Сброс всех фильтров
   const resetFilters = () => {
     setSearchQuery('');
     setEmploymentType('');
@@ -80,33 +69,28 @@ export default function HomePage() {
     setTimeout(() => loadVacancies(), 0);
   };
 
-  // Применить фильтры
   const applyFilters = () => {
     setFilters({ ...filters, page: 0 });
     setTimeout(() => loadVacancies(), 0);
   };
 
-  // Смена страницы
   const goToPage = (page) => {
     setFilters({ ...filters, page });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Смена сортировки
   const handleSort = (sortBy) => {
     const newDirection = filters.sortBy === sortBy && filters.direction === 'DESC' ? 'ASC' : 'DESC';
     setFilters({ ...filters, sortBy, direction: newDirection, page: 0 });
   };
 
-  // Типы занятости для фильтра
   const employmentTypes = [
-    { value: 'FULL_TIME', label: 'Полная занятость' },
-    { value: 'PART_TIME', label: 'Частичная занятость' },
+    { value: 'OFFICE', label: 'Офис' },
+    { value: 'HYBRID', label: 'Гибрид' },
     { value: 'REMOTE', label: 'Удалённая работа' },
-    { value: 'INTERNSHIP', label: 'Стажировка' },
+    { value: 'ON_SITE', label: 'На объекте' },
   ];
 
-  // Уровни опыта для фильтра
   const experienceLevels = [
     { value: 'NO_EXPERIENCE', label: 'Нет опыта' },
     { value: 'JUNIOR', label: 'Junior (до 1 года)' },
@@ -115,7 +99,6 @@ export default function HomePage() {
     { value: 'LEAD', label: 'Lead (6+ лет)' },
   ];
 
-  // Локации для фильтра
   const locations = [
     { value: 'Москва', label: 'Москва' },
     { value: 'Санкт-Петербург', label: 'Санкт-Петербург' },
@@ -144,9 +127,26 @@ export default function HomePage() {
     return date.toLocaleDateString('ru-RU');
   };
 
+  const getEmploymentTypeLabel = (type) => {
+    switch (type) {
+      case 'OFFICE': return 'Офис';
+      case 'HYBRID': return 'Гибрид';
+      case 'REMOTE': return 'Удалённо';
+      case 'ON_SITE': return 'На объекте';
+      default: return type || 'Не указан';
+    }
+  };
+
+  const getVacancyStatusLabel = (status) => {
+    switch (status) {
+      case 'OPEN': return { text: 'Открыта', color: 'bg-green-100 text-green-800' };
+      case 'CLOSED': return { text: 'Закрыта', color: 'bg-red-100 text-red-800' };
+      default: return null;
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Заголовок */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
           Все вакансии
@@ -158,7 +158,6 @@ export default function HomePage() {
         </h1>
       </div>
 
-      {/* Поисковая строка */}
       <form onSubmit={handleSearch} className="mb-4">
         <div className="flex gap-2">
           <div className="flex-1">
@@ -186,21 +185,16 @@ export default function HomePage() {
         </div>
       </form>
 
-      {/* Панель фильтров */}
       <div className={`${showFilters ? 'block' : 'hidden'} md:block mb-6`}>
         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <div className="flex flex-wrap justify-between items-center mb-3">
             <h3 className="font-semibold text-gray-700">🔧 Фильтры</h3>
-            <button
-              onClick={resetFilters}
-              className="text-sm text-blue-600 hover:text-blue-700"
-            >
+            <button onClick={resetFilters} className="text-sm text-blue-600 hover:text-blue-700">
               Сбросить всё
             </button>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {/* Тип занятости */}
             <select
               value={employmentType}
               onChange={(e) => setEmploymentType(e.target.value)}
@@ -212,7 +206,6 @@ export default function HomePage() {
               ))}
             </select>
 
-            {/* Локация */}
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
@@ -224,7 +217,6 @@ export default function HomePage() {
               ))}
             </select>
 
-            {/* Опыт */}
             <select
               value={experienceLevel}
               onChange={(e) => setExperienceLevel(e.target.value)}
@@ -236,7 +228,6 @@ export default function HomePage() {
               ))}
             </select>
 
-            {/* Зарплата от */}
             <input
               type="number"
               placeholder="Зарплата от (₽)"
@@ -245,7 +236,6 @@ export default function HomePage() {
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
 
-            {/* Зарплата до */}
             <input
               type="number"
               placeholder="Зарплата до (₽)"
@@ -266,7 +256,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Сортировка */}
       <div className="flex justify-between items-center mb-4 text-sm">
         <div className="text-gray-500">
           {loading ? 'Загрузка...' : `Найдено: ${totalElements}`}
@@ -287,7 +276,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Список вакансий */}
       {loading ? (
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
@@ -302,74 +290,67 @@ export default function HomePage() {
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <p className="text-gray-500 text-lg">😕 Вакансии не найдены</p>
           <p className="text-gray-400 text-sm mt-2">Попробуйте изменить параметры поиска</p>
-          <button
-            onClick={resetFilters}
-            className="mt-4 text-blue-600 hover:text-blue-700"
-          >
+          <button onClick={resetFilters} className="mt-4 text-blue-600 hover:text-blue-700">
             Сбросить фильтры
           </button>
         </div>
       ) : (
         <div className="space-y-4">
-          {vacancies.map((vacancy) => (
-            <Link
-              key={vacancy.id}
-              to={`/vacancies/${vacancy.id}`}
-              className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-100"
-            >
-              <div className="flex justify-between items-start flex-wrap gap-2">
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600">
-                    {vacancy.title}
-                  </h2>
-                  <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
-                    <span>📍 {vacancy.location || 'Не указана'}</span>
-                    <span>💼 {vacancy.employmentType === 'FULL_TIME' ? 'Полная занятость' :
-                          vacancy.employmentType === 'PART_TIME' ? 'Частичная занятость' :
-                          vacancy.employmentType === 'REMOTE' ? 'Удалённо' : 'Стажировка'}</span>
-                    <span>⭐ {vacancy.experienceLevel === 'NO_EXPERIENCE' ? 'Нет опыта' :
-                          vacancy.experienceLevel === 'JUNIOR' ? 'Junior' :
-                          vacancy.experienceLevel === 'MIDDLE' ? 'Middle' :
-                          vacancy.experienceLevel === 'SENIOR' ? 'Senior' : 'Lead'}</span>
-                    <span>📅 {formatDate(vacancy.createdAt)}</span>
-                  </div>
-                  <p className="text-gray-600 mt-2 line-clamp-2">
-                    {vacancy.description}
-                  </p>
-                  {vacancy.requiredSkills && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {vacancy.requiredSkills.split(',').slice(0, 3).map((skill, idx) => (
-                        <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                          {skill.trim()}
-                        </span>
-                      ))}
-                      {vacancy.requiredSkills.split(',').length > 3 && (
-                        <span className="text-xs text-gray-400">+ ещё</span>
-                      )}
+          {vacancies.map((vacancy) => {
+            const statusInfo = getVacancyStatusLabel(vacancy.status);
+            return (
+              <Link
+                key={vacancy.id}
+                to={`/vacancies/${vacancy.id}`}
+                className="block bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-100"
+              >
+                <div className="flex justify-between items-start flex-wrap gap-2">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600">
+                      {vacancy.title}
+                    </h2>
+                    <div className="flex flex-wrap gap-3 mt-2 text-sm text-gray-500">
+                      <span>📍 {vacancy.location || 'Не указана'}</span>
+                      <span>💼 {getEmploymentTypeLabel(vacancy.employmentType)}</span>
+                      <span>⭐ {vacancy.experienceLevel === 'NO_EXPERIENCE' ? 'Нет опыта' :
+                            vacancy.experienceLevel === 'JUNIOR' ? 'Junior' :
+                            vacancy.experienceLevel === 'MIDDLE' ? 'Middle' :
+                            vacancy.experienceLevel === 'SENIOR' ? 'Senior' : 'Lead'}</span>
+                      <span>📅 {formatDate(vacancy.createdAt)}</span>
                     </div>
-                  )}
+                    <p className="text-gray-600 mt-2 line-clamp-2">
+                      {vacancy.description}
+                    </p>
+                    {vacancy.requiredSkills && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {vacancy.requiredSkills.split(',').slice(0, 3).map((skill, idx) => (
+                          <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                            {skill.trim()}
+                          </span>
+                        ))}
+                        {vacancy.requiredSkills.split(',').length > 3 && (
+                          <span className="text-xs text-gray-400">+ ещё</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-green-600">
+                      {formatSalary(vacancy.salaryFrom, vacancy.salaryTo)}
+                    </p>
+                    {statusInfo && (
+                      <span className={`inline-block mt-1 text-xs px-2 py-1 rounded ${statusInfo.color}`}>
+                        {statusInfo.text}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-green-600">
-                    {formatSalary(vacancy.salaryFrom, vacancy.salaryTo)}
-                  </p>
-                  {vacancy.status === 'OPEN' ? (
-                    <span className="inline-block mt-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                      Открыта
-                    </span>
-                  ) : (
-                    <span className="inline-block mt-1 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Закрыта
-                    </span>
-                  )}
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
 
-      {/* Пагинация */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-8 flex-wrap">
           <button
