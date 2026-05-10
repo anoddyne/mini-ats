@@ -5,6 +5,7 @@ import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import CandidateDashboard from '../pages/candidate/CandidateDashboard';
+import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard';
 import ProfilePage from "../pages/ProfilePage.jsx";
 import CreateVacancyPage from "../pages/recruiter/CreateVacancyPage.jsx";
 
@@ -27,6 +28,9 @@ export default function AppRouter() {
             <Route path="/recruiter/vacancies/create" element={<CreateVacancyPage />} />
             <Route path="/candidate/dashboard" element={
               <ProtectedRoute><CandidateDashboard /></ProtectedRoute>
+            } />
+            <Route path="/recruiter/dashboard" element={
+              <ProtectedRoute><RecruiterDashboard /></ProtectedRoute>
             } />
           </Routes>
         </Layout>

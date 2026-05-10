@@ -2,7 +2,7 @@ import apiClient from './client';
 
 export const authAPI = {
   register: (data) => apiClient.post('/users/register', data),
-  login: (data) => apiClient.post('/auth/login', data),
+  login: (data) => apiClient.post('auth/login', data),
   updateProfile:(userId,updateData) => apiClient.put(`/users/${userId}`,updateData),
 };
 
@@ -27,3 +27,6 @@ export const resumeAPI = {
   }),
   getMyResume: (userId) => apiClient.get(`/resume/${userId}`),
 };
+
+export class statsAPI {
+}
