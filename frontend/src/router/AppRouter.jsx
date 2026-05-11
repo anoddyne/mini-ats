@@ -7,11 +7,25 @@ import RegisterPage from '../pages/RegisterPage';
 import CandidateDashboard from '../pages/candidate/CandidateDashboard';
 import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard';
 import ProfilePage from "../pages/ProfilePage.jsx";
-import CreateVacancyPage from "../pages/recruiter/CreateVacancyPage.jsx";
+import VacancyDetailPage from "../pages/VacancyDetailPage.jsx";
+import CompaniesPage from "../pages/CompaniesPage.jsx";
 
-function ProtectedRoute({ children }) {
+// Страницы для кандидата
+import CandidateDashboard from '../pages/candidate/CandidateDashboard';
+
+// Страницы для рекрутера
+import CreateVacancyPage from "../pages/recruiter/CreateVacancyPage.jsx";
+import EditVacancyPage from "../pages/recruiter/EditVacancyPage.jsx";
+import RecruiterDashboard from "../pages/recruiter/RecruiterDashboard.jsx";
+import CreateCompanyPage from "../pages/recruiter/CreateCompanyPage.jsx";
+import EditCompanyPage from "../pages/recruiter/EditCompanyPage.jsx";
+
+function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" />;
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" />;
+  }
   return children;
 }
 
@@ -21,13 +35,54 @@ export default function AppRouter() {
       <AuthProvider>
         <Layout>
           <Routes>
+            {/* Публичные маршруты */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/vacancies/:id" element={<VacancyDetailPage />} />
+            <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path ="/profile" element={< ProfilePage />}/>
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/recruiter/vacancies/create" element={<CreateVacancyPage />} />
+            
+            {/* Общие для всех авторизованных */}
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Маршруты кандидата */}
             <Route path="/candidate/dashboard" element={
-              <ProtectedRoute><CandidateDashboard /></ProtectedRoute>
+              <ProtectedRoute allowedRoles={['CANDIDATE']}>
+                <CandidateDashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Маршруты рекрутера */}
+            <Route path="/recruiter/dashboard" element={
+              <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
+                <RecruiterDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/recruiter/vacancies/create" element={
+              <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
+                <CreateVacancyPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/recruiter/vacancies/:id/edit" element={
+              <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
+                <EditVacancyPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Маршруты для управления компаниями (только рекрутер/админ) */}
+            <Route path="/companies/create" element={
+              <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
+                <CreateCompanyPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/companies/:id/edit" element={
+              <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
+                <EditCompanyPage />
+              </ProtectedRoute>
             } />
             <Route path="/recruiter/dashboard" element={
               <ProtectedRoute><RecruiterDashboard /></ProtectedRoute>

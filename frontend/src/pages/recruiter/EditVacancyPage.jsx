@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { vacancyAPI } from '../../api/endpoints';
+import { vacancyAPI, companyAPI } from '../../api/endpoints';
 
 export default function EditVacancyPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [companies, setCompanies] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     salaryFrom: '',
     salaryTo: '',
     location: '',
+    companyId: '',
     employmentType: 'OFFICE',
     status: 'DRAFT',
     requiredSkills: '',
@@ -20,24 +22,30 @@ export default function EditVacancyPage() {
   });
 
   useEffect(() => {
-    loadVacancy();
+    loadData();
   }, [id]);
 
-  const loadVacancy = async () => {
+  const loadData = async () => {
+    setLoading(true);
     try {
-      const response = await vacancyAPI.getById(id);
-      const v = response.data;
+      const [vacancyRes, companiesRes] = await Promise.all([
+        vacancyAPI.getById(id),
+        companyAPI.getMyCompanies(),
+      ]);
+      const v = vacancyRes.data;
       setFormData({
         title: v.title || '',
         description: v.description || '',
         salaryFrom: v.salaryFrom || '',
         salaryTo: v.salaryTo || '',
         location: v.location || '',
+        companyId: v.companyId || '',
         employmentType: v.employmentType || 'OFFICE',
         status: v.status || 'DRAFT',
         requiredSkills: v.requiredSkills || '',
         experienceLevel: v.experienceLevel || 'NO_EXPERIENCE',
       });
+      setCompanies(companiesRes.data || []);
     } catch (error) {
       console.error('Ошибка загрузки:', error);
       navigate('/recruiter/dashboard');
@@ -52,6 +60,12 @@ export default function EditVacancyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.companyId) {
+      alert('Пожалуйста, выберите компанию');
+      return;
+    }
+    
     setSaving(true);
     try {
       await vacancyAPI.update(id, formData);
@@ -72,6 +86,26 @@ export default function EditVacancyPage() {
         <h1 className="text-2xl font-bold mb-6">Редактирование вакансии</h1>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Компания <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="companyId"
+              required
+              value={formData.companyId}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-md p-2"
+            >
+              <option value="">-- Выберите компанию --</option>
+              {companies.map(company => (
+                <option key={company.id} value={company.id}>
+                  {company.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Название вакансии *</label>
             <input
@@ -167,7 +201,6 @@ export default function EditVacancyPage() {
               name="requiredSkills"
               value={formData.requiredSkills}
               onChange={handleChange}
-              placeholder="JavaScript, React, Java, Spring (через запятую)"
               className="w-full border border-gray-300 rounded-md p-2"
             />
           </div>
