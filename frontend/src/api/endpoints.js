@@ -3,8 +3,16 @@ import apiClient from './client';
 export const authAPI = {
   register: (data) => apiClient.post('/auth/register', data),
   login: (data) => apiClient.post('/auth/login', data),
-  getCurrentUser: () => apiClient.get('/auth/me'),
-  updateProfile: (data) => apiClient.put('/auth/profile', data),
+  updateProfile: (userId, updateData) => apiClient.put(`/users/${userId}`, updateData),
+};
+
+export const companyAPI = {
+  getAll: (params) => apiClient.get('/companies', { params }),
+  getById: (id) => apiClient.get(`/companies/${id}`),
+  getMyCompanies: () => apiClient.get('/companies/my'),
+  create: (data) => apiClient.post('/companies', data),
+  update: (id, data) => apiClient.put(`/companies/${id}`, data),
+  delete: (id) => apiClient.delete(`/companies/${id}`),
 };
 
 export const vacancyAPI = {
@@ -17,16 +25,6 @@ export const vacancyAPI = {
   publish: (id) => apiClient.patch(`/vacancies/${id}/publish`),
 };
 
-// НОВЫЙ API ДЛЯ КОМПАНИЙ
-export const companyAPI = {
-  getAll: (params) => apiClient.get('/companies', { params }),
-  getById: (id) => apiClient.get(`/companies/${id}`),
-  getMyCompanies: () => apiClient.get('/companies/my'), // Мои компании (для рекрутера)
-  create: (data) => apiClient.post('/companies', data),
-  update: (id, data) => apiClient.put(`/companies/${id}`, data),
-  delete: (id) => apiClient.delete(`/companies/${id}`),
-};
-
 export const applicationAPI = {
   getMyApplications: () => apiClient.get('/applications/my'),
   getByVacancy: (vacancyId) => apiClient.get(`/applications/vacancy/${vacancyId}`),
@@ -37,7 +35,7 @@ export const applicationAPI = {
 };
 
 export const resumeAPI = {
-  getMyResume: () => apiClient.get('/resumes/my'),
+  getMyResume: (userId) => apiClient.get(`/resume/${userId}`),
   upload: (formData) => apiClient.post('/resumes/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),

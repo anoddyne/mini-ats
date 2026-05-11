@@ -43,11 +43,10 @@ export default function CompaniesPage() {
         )}
       </div>
 
-      {/* Поиск */}
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Поиск компаний..."
+          placeholder="Поиск компаний по названию..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -64,46 +63,33 @@ export default function CompaniesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCompanies.map((company) => (
             <div key={company.id} className="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">{company.name}</h2>
-                  {company.industry && (
-                    <p className="text-sm text-gray-500 mt-1">🏭 {company.industry}</p>
-                  )}
-                  {company.location && (
-                    <p className="text-sm text-gray-500">📍 {company.location}</p>
+              <div className="flex items-start gap-3">
+                {company.logoUrl && (
+                  <img
+                    src={company.logoUrl}
+                    alt={company.name}
+                    className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                )}
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h2 className="text-xl font-semibold text-gray-900">{company.name}</h2>
+                    {user?.role === 'RECRUITER' && user.id === company.ownerId && (
+                      <Link
+                        to={`/companies/${company.id}/edit`}
+                        className="text-yellow-600 hover:text-yellow-700"
+                      >
+                        ✏️
+                      </Link>
+                    )}
+                  </div>
+                  {company.description && (
+                    <p className="text-gray-600 text-sm mt-3 line-clamp-2">
+                      {company.description}
+                    </p>
                   )}
                 </div>
-                {user?.role === 'RECRUITER' && user.id === company.ownerId && (
-                  <Link
-                    to={`/companies/${company.id}/edit`}
-                    className="text-yellow-600 hover:text-yellow-700"
-                  >
-                    ✏️
-                  </Link>
-                )}
-              </div>
-              
-              {company.description && (
-                <p className="text-gray-600 text-sm mt-3 line-clamp-2">
-                  {company.description}
-                </p>
-              )}
-              
-              {company.website && (
-                <a
-                  href={company.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 text-sm hover:underline mt-2 inline-block"
-                >
-                  🌐 {company.website}
-                </a>
-              )}
-              
-              <div className="mt-3 text-xs text-gray-400">
-                {company.email && <span>📧 {company.email}</span>}
-                {company.phone && <span className="ml-3">📞 {company.phone}</span>}
               </div>
             </div>
           ))}
