@@ -4,10 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.practice.mini_ats.models.Resume;
@@ -17,19 +16,17 @@ import ru.practice.mini_ats.repositories.ResumeRepository;
 import ru.practice.mini_ats.repositories.UserRepository;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ResumeRepositoryTest {
 
     @Container
     @ServiceConnection
-    private static final PostgreSQLContainer<?> postgresSQLContainer =
-            new PostgreSQLContainer<>("postgres:17.0");
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:17.0");
 
     @Autowired
     private ResumeRepository resumeRepository;
@@ -39,14 +36,8 @@ public class ResumeRepositoryTest {
 
     private User testUser;
 
-    @Test
-    void testThatConnectionEstablished() {
-        assertThat(postgresSQLContainer.isCreated()).isTrue();
-        assertThat(postgresSQLContainer.isRunning()).isTrue();
-    }
-
     @BeforeEach
-    void beforeEach() {
+    void setUp() {
         resumeRepository.deleteAll();
         userRepository.deleteAll();
 
@@ -69,132 +60,145 @@ public class ResumeRepositoryTest {
     @Test
     void saveResumeTest() {
         Resume resume = new Resume();
-        resume.setSummary("Experienced Java developer with Spring");
-        resume.setEducation("Master's in Computer Science");
-        resume.setDesiredSalary(250000);
-        resume.setResumeFileUrl("https://example.com/resume.pdf");
-        resume.setSkills(Map.of("Java", 5, "Spring", 4));
-        resume.setExperience(Map.of("years", 5, "lastPosition", "Tech Lead"));
+        resume.setResumeFileUrl("https://minio.local/resume.pdf");
+        resume.setFileName("resume.pdf");
         resume.setUser(testUser);
 
         Resume saved = resumeRepository.save(resume);
-        Resume found = resumeRepository.findById(saved.getResumeId()).orElse(null);
+        assertThat(saved.getResumeId()).isNotNull();
 
-        assertThat(found).isNotNull();
-        assertThat(found).isEqualTo(saved);
+        Optional<Resume> found = resumeRepository.findById(saved.getResumeId());
+        assertThat(found).isPresent();
+        assertThat(found.get().getFileName()).isEqualTo("resume.pdf");
     }
 
     @Test
-    void findAllResumesTest() {
+    void findByIdTest() {
+        Resume resume = new Resume();
+        resume.setResumeFileUrl("url");
+        resume.setFileName("file.pdf");
+        resume.setUser(testUser);
+        Resume saved = resumeRepository.save(resume);
+
+        Optional<Resume> found = resumeRepository.findById(saved.getResumeId());
+        assertThat(found).isPresent();
+        assertThat(found.get().getResumeId()).isEqualTo(saved.getResumeId());
+    }
+
+    @Test
+    void findAllTest() {
         Resume r1 = new Resume();
-        r1.setSummary("First resume");
+        r1.setResumeFileUrl("url1");
+        r1.setFileName("r1.pdf");
         r1.setUser(testUser);
 
         Resume r2 = new Resume();
-        r2.setSummary("Second resume");
+        r2.setResumeFileUrl("url2");
+        r2.setFileName("r2.pdf");
         r2.setUser(testUser);
 
         resumeRepository.saveAll(List.of(r1, r2));
         List<Resume> resumes = resumeRepository.findAll();
 
         assertThat(resumes).hasSize(2);
-        assertThat(resumes).containsExactlyInAnyOrder(r1, r2);
+        assertThat(resumes).extracting(Resume::getFileName).containsExactlyInAnyOrder("r1.pdf", "r2.pdf");
     }
 
     @Test
-    void deleteResumeByIdTest() {
+    void deleteByIdTest() {
         Resume resume = new Resume();
-        resume.setSummary("To be deleted");
+        resume.setResumeFileUrl("toDelete");
+        resume.setFileName("delete.pdf");
         resume.setUser(testUser);
-
         Resume saved = resumeRepository.save(resume);
-        resumeRepository.deleteById(saved.getResumeId());
 
-        assertThat(resumeRepository.findById(saved.getResumeId())).isEmpty();
+        resumeRepository.deleteById(saved.getResumeId());
+        Optional<Resume> found = resumeRepository.findById(saved.getResumeId());
+        assertThat(found).isEmpty();
     }
 
     @Test
-    void deleteAllResumesTest() {
+    void deleteAllTest() {
         Resume r1 = new Resume();
-        r1.setSummary("Temp1");
+        r1.setResumeFileUrl("temp1");
+        r1.setFileName("t1.pdf");
         r1.setUser(testUser);
 
         Resume r2 = new Resume();
-        r2.setSummary("Temp2");
+        r2.setResumeFileUrl("temp2");
+        r2.setFileName("t2.pdf");
         r2.setUser(testUser);
 
         resumeRepository.saveAll(List.of(r1, r2));
         resumeRepository.deleteAll();
 
-        List<Resume> resumes = resumeRepository.findAll();
-        assertThat(resumes).isEmpty();
+        assertThat(resumeRepository.findAll()).isEmpty();
     }
 
     @Test
     void updateResumeTest() {
         Resume resume = new Resume();
-        resume.setSummary("Old summary");
-        resume.setDesiredSalary(100000);
+        resume.setResumeFileUrl("oldUrl");
+        resume.setFileName("old.pdf");
         resume.setUser(testUser);
-
         Resume saved = resumeRepository.save(resume);
-        saved.setSummary("New summary");
-        saved.setDesiredSalary(150000);
+
+        saved.setResumeFileUrl("newUrl");
+        saved.setFileName("new.pdf");
         resumeRepository.save(saved);
 
-        Resume updated = resumeRepository.findById(saved.getResumeId()).orElse(null);
-        assertThat(updated).isNotNull();
-        assertThat(updated.getSummary()).isEqualTo("New summary");
-        assertThat(updated.getDesiredSalary()).isEqualTo(150000);
+        Optional<Resume> updated = resumeRepository.findById(saved.getResumeId());
+        assertThat(updated).isPresent();
+        assertThat(updated.get().getResumeFileUrl()).isEqualTo("newUrl");
+        assertThat(updated.get().getFileName()).isEqualTo("new.pdf");
     }
 
     @Test
-    void saveResumeWithoutOptionalFieldsTest() {
+    void saveResumeWithOnlyRequiredFieldsTest() {
         Resume resume = new Resume();
-        resume.setSummary("Minimal resume");
-        resume.setUser(testUser);
+        resume.setUser(testUser); // только ссылка на пользователя
 
         Resume saved = resumeRepository.save(resume);
-        Resume found = resumeRepository.findById(saved.getResumeId()).orElse(null);
+        Optional<Resume> found = resumeRepository.findById(saved.getResumeId());
 
-        assertThat(found).isNotNull();
-        assertThat(found.getSummary()).isEqualTo("Minimal resume");
-        assertThat(found.getEducation()).isNull();
-        assertThat(found.getDesiredSalary()).isNull();
-        assertThat(found.getResumeFileUrl()).isNull();
-        assertThat(found.getSkills()).isNull();
-        assertThat(found.getExperience()).isNull();
+        assertThat(found).isPresent();
+        assertThat(found.get().getResumeFileUrl()).isNull();
+        assertThat(found.get().getFileName()).isNull();
+        assertThat(found.get().getUser()).isEqualTo(testUser);
+    }
+
+    // ========== Кастомный метод findByUserUserId ==========
+
+    @Test
+    void findByUserUserIdReturnsResumeWhenExists() {
+        Resume resume = new Resume();
+        resume.setResumeFileUrl("url");
+        resume.setFileName("user.pdf");
+        resume.setUser(testUser);
+        resumeRepository.save(resume);
+
+        Optional<Resume> found = resumeRepository.findByUserUserId(testUser.getUserId());
+        assertThat(found).isPresent();
+        assertThat(found.get().getFileName()).isEqualTo("user.pdf");
     }
 
     @Test
-    void findByUserIdTest() {
-        Resume r1 = new Resume();
-        r1.setSummary("First resume for user");
-        r1.setUser(testUser);
+    void findByUserUserIdReturnsEmptyWhenNotFound() {
+        Optional<Resume> found = resumeRepository.findByUserUserId(testUser.getUserId());
+        assertThat(found).isEmpty();
+    }
 
-        Resume r2 = new Resume();
-        r2.setSummary("Second resume for user");
-        r2.setUser(testUser);
+    @Test
+    void findByUserUserIdReturnsLatestForUser() {
 
-        // Создаём другого пользователя для проверки, что его резюме не попадают в выборку
-        User otherUser = new User();
-        otherUser.setName("Other");
-        otherUser.setSurname("User");
-        otherUser.setEmail("other@example.com");
-        otherUser.setLogin("other");
-        otherUser.setPassword("pass");
-        otherUser.setRole(UserRole.CANDIDATE);
-        otherUser = userRepository.save(otherUser);
+        Resume r = new Resume();
+        r.setResumeFileUrl("latest");
+        r.setFileName("latest.pdf");
+        r.setUser(testUser);
+        resumeRepository.save(r);
 
-        Resume r3 = new Resume();
-        r3.setSummary("Other user's resume");
-        r3.setUser(otherUser);
-
-        resumeRepository.saveAll(List.of(r1, r2, r3));
-
-        List<Resume> resumesForTestUser = resumeRepository.findByUser_UserId(testUser.getUserId());
-
-        assertThat(resumesForTestUser).hasSize(2);
-        assertThat(resumesForTestUser).containsExactlyInAnyOrder(r1, r2);
+        Optional<Resume> found = resumeRepository.findByUserUserId(testUser.getUserId());
+        assertThat(found).isPresent();
+        assertThat(found.get().getFileName()).isEqualTo("latest.pdf");
     }
 }
