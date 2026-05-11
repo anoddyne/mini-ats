@@ -10,13 +10,10 @@ import ProfilePage from "../pages/ProfilePage.jsx";
 import VacancyDetailPage from "../pages/VacancyDetailPage.jsx";
 import CompaniesPage from "../pages/CompaniesPage.jsx";
 
-// Страницы для кандидата
-import CandidateDashboard from '../pages/candidate/CandidateDashboard';
 
 // Страницы для рекрутера
 import CreateVacancyPage from "../pages/recruiter/CreateVacancyPage.jsx";
 import EditVacancyPage from "../pages/recruiter/EditVacancyPage.jsx";
-import RecruiterDashboard from "../pages/recruiter/RecruiterDashboard.jsx";
 import CreateCompanyPage from "../pages/recruiter/CreateCompanyPage.jsx";
 import EditCompanyPage from "../pages/recruiter/EditCompanyPage.jsx";
 

@@ -36,11 +36,10 @@ export const applicationAPI = {
 };
 
 export const resumeAPI = {
-  getMyResume: () => apiClient.get('/resumes/my'),
-  upload: (formData) => apiClient.post('/resumes/upload', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }),
-  getMyResume: (userId) => apiClient.get(`/resume/${userId}`),
+  getMyResume: () => apiClient.get('/resume'),
+  upload: (formData) => apiClient.post('/resume', formData),
+  download: () => apiClient.get('/resume/download', { responseType: 'blob' }),
+  delete: () => apiClient.delete('/resume'),
 };
 
 export class statsAPI {

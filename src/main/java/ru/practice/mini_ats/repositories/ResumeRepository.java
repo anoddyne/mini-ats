@@ -15,4 +15,5 @@ public interface ResumeRepository extends JpaRepository<Resume, Integer> {
 
     Optional<Resume> findByUserUserId(Integer userId);
     List<Resume> findByUser_UserId(Integer userId);
+    String getFileNameByUser_UserId(Integer userId);
 }

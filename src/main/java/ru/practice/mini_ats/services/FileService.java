@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.annotation.PostConstruct;
+
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -21,6 +22,9 @@ public class FileService {
 
     @Value("${minio.bucket-name}")
     private String bucketName;
+
+    @Value("${minio.url}")
+    private String minioEndpoint;
 
     @PostConstruct
     public void initBucket() {
@@ -44,21 +48,17 @@ public class FileService {
 
     /**
      * Загрузка файла в MinIO
+     *
      * @param file MultipartFile из запроса
      * @return уникальное имя файла (для сохранения в БД)
      */
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file, String login) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
 
         try {
-            String originalFilename = file.getOriginalFilename();
-            String extension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String uniqueFileName = UUID.randomUUID().toString() + extension;
+            String uniqueFileName =  login + file.getOriginalFilename();
 
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -80,6 +80,7 @@ public class FileService {
 
     /**
      * Скачивание файла из MinIO
+     *
      * @param fileName уникальное имя файла
      * @return InputStream содержимого файла
      */
@@ -99,6 +100,7 @@ public class FileService {
 
     /**
      * Удаление файла из MinIO
+     *
      * @param fileName уникальное имя файла
      */
     public void deleteFile(String fileName) {
@@ -116,56 +118,34 @@ public class FileService {
         }
     }
 
-//    /**
-//     * Получение публичной ссылки на файл (если бакет публичный)
-//     * @param fileName уникальное имя файла
-//     * @return прямая ссылка на файл
-//     */
-//    public String getPublicFileUrl(String fileName) {
-//        return String.format("%s/%s/%s",
-//                minioClient.getEndpoint().toString().replaceFirst("/$", ""),
-//                bucketName,
-//                fileName
-//        );
-//    }
-
     /**
-     * Генерация временной ссылки для приватного доступа (действует, например, 1 час)
+     * Получение публичной ссылки на файл (если бакет публичный)
      * @param fileName уникальное имя файла
-     * @param expirySeconds время жизни в секундах
-     * @return подписанная ссылка
+     * @return прямая ссылка на файл
      */
-    public String getPresignedUrl(String fileName, int expirySeconds) {
-        try {
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .bucket(bucketName)
-                            .object(fileName)
-                            .method(io.minio.http.Method.GET)
-                            .expiry(expirySeconds)
-                            .build()
-            );
-        } catch (Exception e) {
-            log.error("Presigned URL generation failed: {}", e.getMessage());
-            throw new RuntimeException("Failed to generate presigned URL", e);
-        }
+    public String getPublicFileUrl(String fileName) {
+        return String.format("%s/%s/%s",
+                minioEndpoint.replaceFirst("/$", ""),
+                bucketName,
+                fileName
+        );
     }
 
     // Приватный метод для установки публичной политики (если нужно)
     private void setPublicBucketPolicy() throws Exception {
         String policy = """
-            {
-              "Version": "2012-10-17",
-              "Statement": [
                 {
-                  "Effect": "Allow",
-                  "Principal": "*",
-                  "Action": "s3:GetObject",
-                  "Resource": "arn:aws:s3:::%s/*"
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": "*",
+                      "Action": "s3:GetObject",
+                      "Resource": "arn:aws:s3:::%s/*"
+                    }
+                  ]
                 }
-              ]
-            }
-            """.formatted(bucketName);
+                """.formatted(bucketName);
 
         minioClient.setBucketPolicy(
                 SetBucketPolicyArgs.builder()
