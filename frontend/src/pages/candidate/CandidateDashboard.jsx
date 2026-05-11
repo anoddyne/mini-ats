@@ -46,11 +46,19 @@ export default function CandidateDashboard() {
       const userId = user?.userId;
       const [applicationsRes, resumeRes] = await Promise.all([
         applicationAPI.getMyApplications(userId).catch(() => ({ data: [] })),
-        resumeAPI.getMyResume().catch(() => ({ data: null })), // если 204, то data = null
+        resumeAPI.getMyResume().catch(() => ({ data: null })),
       ]);
       setApplications(applicationsRes.data);
-      setResume(resumeRes.data); // может быть null
-      // ... статистика
+      setResume(resumeRes.data);
+      // Подсчёт статистики
+      const byStatus = {};
+      applicationsRes.data.forEach(app => {
+        byStatus[app.status] = (byStatus[app.status] || 0) + 1;
+      });
+      setStats({
+        total: applicationsRes.data.length,
+        byStatus,
+      });
     } catch (error) {
       console.error('Ошибка загрузки:', error);
     } finally {
@@ -58,7 +66,7 @@ export default function CandidateDashboard() {
     }
   };
 
-// Загрузка файла
+  // Загрузка файла
   const handleResumeUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -77,7 +85,7 @@ export default function CandidateDashboard() {
     setUploading(true);
     try {
       const response = await resumeAPI.upload(formData);
-      setResume(response.data); // обновляем state
+      setResume(response.data);
       alert('Резюме загружено');
     } catch (err) {
       console.error(err);
@@ -87,7 +95,7 @@ export default function CandidateDashboard() {
     }
   };
 
-// Скачивание
+  // Скачивание
   const handleDownloadResume = async () => {
     if (!resume) {
       alert('Резюме не найдено');
@@ -109,7 +117,7 @@ export default function CandidateDashboard() {
     }
   };
 
-// Удаление
+  // Удаление
   const handleDeleteResume = async () => {
     if (!confirm('Удалить резюме?')) return;
     setDeleting(true);
@@ -168,32 +176,40 @@ export default function CandidateDashboard() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">📄 Моё резюме</h2>
           {resume ? (
-              <div className="flex justify-between items-center flex-wrap gap-3">
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center flex-wrap gap-3">
+                  <div>
+                    <p className="text-green-600">✓ Резюме загружено</p>
+                    <p className="text-sm text-gray-500 mt-1 break-all">
+                      📄 {resume.fileName || 'Файл'}
+                    </p>
+                  </div>
+                  <label className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
+                    Заменить
+                    <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleResumeUpload}
+                        disabled={uploading}
+                        className="hidden"
+                    />
+                  </label>
+                </div>
+                <div className="flex gap-4">
                   <button
                       onClick={handleDownloadResume}
-                      className="text-blue-600 hover:underline text-sm flex items-center"
+                      className="text-blue-600 hover:underline text-sm flex items-center gap-1"
                   >
                     📥 Скачать
                   </button>
                   <button
                       onClick={handleDeleteResume}
                       disabled={deleting}
-                      className="text-red-600 hover:underline text-sm flex items-center"
+                      className="text-red-600 hover:underline text-sm flex items-center gap-1"
                   >
                     {deleting ? 'Удаление...' : '🗑️ Удалить'}
                   </button>
                 </div>
-                <label className="cursor-pointer bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
-                  Заменить
-                  <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleResumeUpload}
-                      disabled={uploading}
-                      className="hidden"
-                  />
-                </label>
               </div>
           ) : (
               <div className="text-center py-4">
