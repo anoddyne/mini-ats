@@ -1,21 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { vacancyAPI } from '../../api/endpoints';
+import { vacancyAPI, companyAPI } from '../../api/endpoints';
 
 export default function CreateVacancyPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [companiesLoading, setCompaniesLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     salaryFrom: '',
     salaryTo: '',
     location: '',
+    companyId: '',      // ← НОВОЕ ПОЛЕ: ID компании
     employmentType: 'OFFICE',
     status: 'DRAFT',
     requiredSkills: '',
     experienceLevel: 'NO_EXPERIENCE',
   });
+
+  // Загружаем список компаний при загрузке страницы
+  useEffect(() => {
+    loadCompanies();
+  }, []);
+
+  const loadCompanies = async () => {
+    setCompaniesLoading(true);
+    try {
+      const response = await companyAPI.getMyCompanies(); // Только мои компании
+      setCompanies(response.data || []);
+    } catch (error) {
+      console.error('Ошибка загрузки компаний:', error);
+    } finally {
+      setCompaniesLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,6 +43,13 @@ export default function CreateVacancyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Проверяем, выбрана ли компания
+    if (!formData.companyId) {
+      alert('Пожалуйста, выберите компанию');
+      return;
+    }
+    
     setLoading(true);
     try {
       await vacancyAPI.create(formData);
@@ -41,6 +68,44 @@ export default function CreateVacancyPage() {
         <h1 className="text-2xl font-bold mb-6">Создание вакансии</h1>
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* ВЫБОР КОМПАНИИ */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Компания <span className="text-red-500">*</span>
+            </label>
+            {companiesLoading ? (
+              <div className="text-gray-500">Загрузка компаний...</div>
+            ) : companies.length === 0 ? (
+              <div className="border border-red-300 bg-red-50 rounded-md p-3">
+                <p className="text-red-600 text-sm mb-2">
+                  У вас нет компаний. Сначала создайте компанию.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/companies/create')}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
+                >
+                  + Создать компанию
+                </button>
+              </div>
+            ) : (
+              <select
+                name="companyId"
+                required
+                value={formData.companyId}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-600 focus:border-blue-600"
+              >
+                <option value="">-- Выберите компанию --</option>
+                {companies.map(company => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Название вакансии *</label>
             <input
@@ -161,7 +226,7 @@ export default function CreateVacancyPage() {
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || companies.length === 0}
               className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
               {loading ? 'Создание...' : 'Создать вакансию'}
