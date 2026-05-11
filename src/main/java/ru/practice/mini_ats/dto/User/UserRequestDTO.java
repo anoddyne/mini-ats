@@ -2,6 +2,7 @@ package ru.practice.mini_ats.dto.User;
 
 
 import jakarta.validation.constraints.*;
+import ru.practice.mini_ats.models.enums.UserRole;
 
 public record UserRequestDTO(
         @NotBlank(message = "Имя пользователя не может быть пустым")
@@ -27,6 +28,9 @@ public record UserRequestDTO(
 
         @NotBlank
         @Size(min = 8, max = 100, message = "Длина пароля должна быть от 8 до 100 символов")
-        String password
+        String password,
+
+        @NotNull
+        UserRole role
 ) {
 }

@@ -34,13 +34,11 @@ public class Resume {
     @Column(name = "resume_file_url")
     private String resumeFileUrl;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "skills", columnDefinition = "jsonb")
-    private Map<String, Object> skills;
+    @Column(name = "skills")
+    private String skills;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "experience", columnDefinition = "jsonb")
-    private Map<String, Object> experience;
+    @Column(name = "experience")
+    private String experience;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)

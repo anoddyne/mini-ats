@@ -8,8 +8,8 @@ public record ResumeResponseDTO(
         String education,
         Integer desiredSalary,
         String resumeFileUrl,
-        Map<String, Object> skills,
-        Map<String, Object> experience,
+        String skills,
+        String experience,
         Integer userId,
         String userFullName
 ) {

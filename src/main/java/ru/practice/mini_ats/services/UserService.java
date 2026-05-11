@@ -27,7 +27,7 @@ public class UserService {
             throw new RuntimeException("Пользователь с таким логином или почтой уже существует");
         }
         User user = userMapper.toEntity(dto);
-        user.setRole(UserRole.CANDIDATE);
+        user.setRole(dto.role());
         user.setActive(true);
         user.setPassword(passwordEncoder.encode(dto.password()));
 

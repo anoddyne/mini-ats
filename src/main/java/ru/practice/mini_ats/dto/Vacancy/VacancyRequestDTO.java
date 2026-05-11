@@ -4,9 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import ru.practice.mini_ats.models.enums.EmploymentType;
+import ru.practice.mini_ats.models.enums.ExperienceLevel;
 import ru.practice.mini_ats.models.enums.VacancyStatus;
 
-import java.util.Map;
 
 public record VacancyRequestDTO(
         @NotBlank(message = "Заголовок вакансии обязателен")
@@ -27,9 +27,9 @@ public record VacancyRequestDTO(
 
         VacancyStatus status,
 
-        Map<String, Object> requiredSkills,
+        String requiredSkills,
 
-        Integer experienceLevel,
+        ExperienceLevel experienceLevel,
 
         @NotNull(message = "Укажите компанию")
         Integer companyId

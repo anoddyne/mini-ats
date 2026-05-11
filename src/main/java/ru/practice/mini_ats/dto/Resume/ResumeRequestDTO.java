@@ -17,7 +17,7 @@ public record ResumeRequestDTO(
 
         @URL(message = "Неверный формат ссылки")
         String resumeFileUrl,
-        Map<String, Object> skills,
-        Map<String, Object> experience
+        String skills,
+        String experience
 ) {
 }

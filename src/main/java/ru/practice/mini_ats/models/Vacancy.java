@@ -3,14 +3,12 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.SoftDeleteType;
-import org.hibernate.type.SqlTypes;
 import ru.practice.mini_ats.models.enums.EmploymentType;
+import ru.practice.mini_ats.models.enums.ExperienceLevel;
 import ru.practice.mini_ats.models.enums.VacancyStatus;
 
-import java.util.Map;
 
 @Entity
 @Getter
@@ -46,12 +44,12 @@ public class Vacancy {
     @Column(name = "status", nullable = false)
     private VacancyStatus status;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "required_skills", columnDefinition = "jsonb")
-    private Map<String, Object> requiredSkills;
+    @Column(name = "required_skills")
+    private String requiredSkills;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "experience_level")
-    private Integer experienceLevel;
+    private ExperienceLevel experienceLevel;
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "company_id", nullable = false)
