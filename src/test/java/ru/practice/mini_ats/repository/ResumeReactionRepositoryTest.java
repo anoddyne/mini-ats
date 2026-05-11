@@ -63,7 +63,6 @@ public class ResumeReactionRepositoryTest {
         companyRepository.deleteAll();
         userRepository.deleteAll();
 
-        // Создаём пользователя для резюме
         User user = new User();
         user.setName("ResumeUser");
         user.setSurname("Test");
@@ -75,17 +74,14 @@ public class ResumeReactionRepositoryTest {
 
         // Создаём резюме
         testResume = new Resume();
-        testResume.setSummary("Test summary");
         testResume.setUser(user);
         testResume = resumeRepository.save(testResume);
 
-        // Создаём компанию для вакансии
         Company company = new Company();
         company.setName("Test Company");
         company.setDescription("Company for vacancy");
         company = companyRepository.save(company);
 
-        // Создаём вакансию
         testVacancy = new Vacancy();
         testVacancy.setTitle("Test Vacancy");
         testVacancy.setEmploymentType(EmploymentType.REMOTE);

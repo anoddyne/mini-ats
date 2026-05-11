@@ -1,5 +1,6 @@
 package ru.practice.mini_ats.mapper;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import ru.practice.mini_ats.dto.ResumeReaction.ResumeReactionRequestDTO;
 import ru.practice.mini_ats.dto.ResumeReaction.ResumeReactionResponseDTO;
@@ -19,6 +20,23 @@ class ResumeReactionMapperImplTest {
     @Test
     void toResponseDto_shouldMapAllFields() {
         // given
+        ResumeReaction reaction = getResumeReaction();
+
+        // when
+        ResumeReactionResponseDTO dto = mapper.toResponseDto(reaction);
+
+        // then
+        assertThat(dto).isNotNull();
+        assertThat(dto.resumeReactionId()).isEqualTo(100);
+        assertThat(dto.coverLetter()).isEqualTo("Заинтересован в позиции");
+        assertThat(dto.appliedAt()).isEqualTo(LocalDate.of(2026, 4, 26));
+        assertThat(dto.vacancyId()).isEqualTo(15);
+        assertThat(dto.vacancyTitle()).isEqualTo("Java разработчик");
+        assertThat(dto.resumeId()).isEqualTo(20);
+        assertThat(dto.candidateFullName()).isEqualTo("Петров Иван Сергеевич");
+    }
+
+    private static @NonNull ResumeReaction getResumeReaction() {
         User user = new User();
         user.setUserId(7);
         user.setName("Иван");
@@ -39,19 +57,7 @@ class ResumeReactionMapperImplTest {
         reaction.setAppliedAt(LocalDate.of(2026, 4, 26));
         reaction.setResume(resume);
         reaction.setVacancy(vacancy);
-
-        // when
-        ResumeReactionResponseDTO dto = mapper.toResponseDto(reaction);
-
-        // then
-        assertThat(dto).isNotNull();
-        assertThat(dto.resumeReactionId()).isEqualTo(100);
-        assertThat(dto.coverLetter()).isEqualTo("Заинтересован в позиции");
-        assertThat(dto.appliedAt()).isEqualTo(LocalDate.of(2026, 4, 26));
-        assertThat(dto.vacancyId()).isEqualTo(15);
-        assertThat(dto.vacancyTitle()).isEqualTo("Java разработчик");
-        assertThat(dto.resumeId()).isEqualTo(20);
-        assertThat(dto.candidateFullName()).isEqualTo("Петров Иван Сергеевич");
+        return reaction;
     }
 
     @Test

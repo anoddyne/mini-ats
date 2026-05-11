@@ -19,7 +19,6 @@ import ru.practice.mini_ats.repositories.CompanyRepository;
 import ru.practice.mini_ats.repositories.VacancyRepository;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -75,8 +74,7 @@ public class VacancyRepositoryTest {
         vacancy.setLocation("Moscow");
         vacancy.setEmploymentType(EmploymentType.REMOTE);
         vacancy.setStatus(VacancyStatus.DRAFT);
-        vacancy.setRequiredSkills(Map.of("Java", 5, "Spring", 4));
-        vacancy.setExperienceLevel(3);
+
         vacancy.setCompany(testCompany);
 
         Vacancy saved = vacancyRepository.save(vacancy);

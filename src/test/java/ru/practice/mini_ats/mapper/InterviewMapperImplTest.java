@@ -1,5 +1,6 @@
 package ru.practice.mini_ats.mapper;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import ru.practice.mini_ats.dto.Interview.InterviewFeedbackDTO;
 import ru.practice.mini_ats.dto.Interview.InterviewRequestDTO;
@@ -19,6 +20,25 @@ class InterviewMapperImplTest {
     @Test
     void toResponseDto_shouldMapAllFields() {
         // given
+        Interview interview = getInterview();
+
+        // when
+        InterviewResponseDTO dto = mapper.toResponseDto(interview);
+
+        // then
+        assertThat(dto).isNotNull();
+        assertThat(dto.interviewId()).isEqualTo(202);
+        assertThat(dto.date()).isEqualTo(LocalDate.of(2026, 5, 10));
+        assertThat(dto.type()).isEqualTo(InterviewType.TECHNICAL);
+        assertThat(dto.status()).isEqualTo(InterviewStatus.SCHEDULED);
+        assertThat(dto.feedback()).isEqualTo("Предварительное согласие получено");
+        assertThat(dto.resumeReactionId()).isEqualTo(101);
+        assertThat(dto.vacancyTitle()).isEqualTo("Старший Java-разработчик");
+        assertThat(dto.candidateFullName()).isEqualTo("Смирнова Анна Ивановна");
+        assertThat(dto.companyName()).isEqualTo("ООО Рога и Копыта");
+    }
+
+    private static @NonNull Interview getInterview() {
         User user = new User();
         user.setUserId(10);
         user.setName("Анна");
@@ -50,21 +70,7 @@ class InterviewMapperImplTest {
         interview.setStatus(InterviewStatus.SCHEDULED);
         interview.setFeedback("Предварительное согласие получено");
         interview.setResumeReaction(reaction);
-
-        // when
-        InterviewResponseDTO dto = mapper.toResponseDto(interview);
-
-        // then
-        assertThat(dto).isNotNull();
-        assertThat(dto.interviewId()).isEqualTo(202);
-        assertThat(dto.date()).isEqualTo(LocalDate.of(2026, 5, 10));
-        assertThat(dto.type()).isEqualTo(InterviewType.TECHNICAL);
-        assertThat(dto.status()).isEqualTo(InterviewStatus.SCHEDULED);
-        assertThat(dto.feedback()).isEqualTo("Предварительное согласие получено");
-        assertThat(dto.resumeReactionId()).isEqualTo(101);
-        assertThat(dto.vacancyTitle()).isEqualTo("Старший Java-разработчик");
-        assertThat(dto.candidateFullName()).isEqualTo("Смирнова Анна Ивановна");
-        assertThat(dto.companyName()).isEqualTo("ООО Рога и Копыта");
+        return interview;
     }
 
     @Test

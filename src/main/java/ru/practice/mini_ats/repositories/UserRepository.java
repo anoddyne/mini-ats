@@ -18,14 +18,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByLogin(@NotBlank String login);
 
     User findUserByLogin(@NotBlank String login);
-
-    User findUserByEmail(@Email @NotBlank String email);
-
-    User findUserByLoginAndPassword(@NotBlank String login, @NotBlank String password);
-
-    void deleteUserByLogin(@NotBlank String login);
-
-    void deleteUserByEmail(@Email @NotBlank String email);
-
-    User findUserByNameAndSurname(@NotBlank String name, @NotBlank String surname);
 }
