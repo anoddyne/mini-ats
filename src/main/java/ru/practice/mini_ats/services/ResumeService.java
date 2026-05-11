@@ -11,6 +11,7 @@ import ru.practice.mini_ats.models.Resume;
 import ru.practice.mini_ats.models.User;
 import ru.practice.mini_ats.repositories.ResumeRepository;
 import ru.practice.mini_ats.repositories.UserRepository;
+import ru.practice.mini_ats.security.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +21,11 @@ public class ResumeService {
     private final ResumeMapper resumeMapper;
 
     @Transactional
-    public ResumeResponseDTO createResume(ResumeRequestDTO dto, Integer userId) {
-        // параметр userId в будущем будет извлекаться из SecurityContext
-        User user = userRepository.findById(userId)
+    public ResumeResponseDTO createResume(ResumeRequestDTO dto) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User user = userRepository.findByLogin(login)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
-        if (resumeRepository.existsByUserUserId(userId)) {
+        if (resumeRepository.existsByUserUserId(user.getUserId())) {
             throw new RuntimeException("У пользователя уже есть резюме");
         }
         Resume resume = resumeMapper.toEntity(dto);

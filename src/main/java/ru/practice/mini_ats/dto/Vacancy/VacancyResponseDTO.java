@@ -3,7 +3,6 @@ package ru.practice.mini_ats.dto.Vacancy;
 import ru.practice.mini_ats.models.enums.EmploymentType;
 import ru.practice.mini_ats.models.enums.VacancyStatus;
 
-import java.util.Map;
 
 public record VacancyResponseDTO(
         Integer vacancyId,

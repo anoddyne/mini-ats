@@ -5,7 +5,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
-import java.util.Map;
 
 public record ResumeRequestDTO(
         @Size(max = 2000, message = "Текст не может быть больше 2000 символов")

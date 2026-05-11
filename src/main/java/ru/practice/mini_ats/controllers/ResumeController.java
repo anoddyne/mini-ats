@@ -21,8 +21,8 @@ public class ResumeController {
 
     @Operation(summary = "Загрузить резюме")
     @PostMapping
-    public ResponseEntity<ResumeResponseDTO> loadResume(@Valid @RequestBody ResumeRequestDTO dto, Integer userId){
-        return new ResponseEntity<>(resumeService.createResume(dto, userId), HttpStatus.CREATED);
+    public ResponseEntity<ResumeResponseDTO> loadResume(@Valid @RequestBody ResumeRequestDTO dto){
+        return new ResponseEntity<>(resumeService.createResume(dto), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Получить резюме по id пользователя")

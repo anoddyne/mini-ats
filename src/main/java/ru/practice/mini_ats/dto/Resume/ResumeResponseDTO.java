@@ -1,6 +1,5 @@
 package ru.practice.mini_ats.dto.Resume;
 
-import java.util.Map;
 
 public record ResumeResponseDTO(
         Integer resumeId,
