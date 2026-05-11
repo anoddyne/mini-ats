@@ -4,6 +4,8 @@ import Layout from '../components/Layout';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
+import CandidateDashboard from '../pages/candidate/CandidateDashboard';
+import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard';
 import ProfilePage from "../pages/ProfilePage.jsx";
 import VacancyDetailPage from "../pages/VacancyDetailPage.jsx";
 import CompaniesPage from "../pages/CompaniesPage.jsx";
@@ -81,6 +83,9 @@ export default function AppRouter() {
               <ProtectedRoute allowedRoles={['RECRUITER', 'ADMIN']}>
                 <EditCompanyPage />
               </ProtectedRoute>
+            } />
+            <Route path="/recruiter/dashboard" element={
+              <ProtectedRoute><RecruiterDashboard /></ProtectedRoute>
             } />
           </Routes>
         </Layout>

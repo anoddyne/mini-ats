@@ -1,10 +1,9 @@
 import apiClient from './client';
 
 export const authAPI = {
-  register: (data) => apiClient.post('/auth/register', data),
-  login: (data) => apiClient.post('/auth/login', data),
-  getCurrentUser: () => apiClient.get('/auth/me'),
-  updateProfile: (data) => apiClient.put('/auth/profile', data),
+  register: (data) => apiClient.post('/users/register', data),
+  login: (data) => apiClient.post('auth/login', data),
+  updateProfile:(userId,updateData) => apiClient.put(`/users/${userId}`,updateData),
 };
 
 export const vacancyAPI = {
@@ -41,8 +40,8 @@ export const resumeAPI = {
   upload: (formData) => apiClient.post('/resumes/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
+  getMyResume: (userId) => apiClient.get(`/resume/${userId}`),
 };
 
-export const statsAPI = {
-  getRecruiterStats: () => apiClient.get('/stats/recruiter'),
-};
+export class statsAPI {
+}
