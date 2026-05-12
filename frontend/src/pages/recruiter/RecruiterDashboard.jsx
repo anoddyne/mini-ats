@@ -70,19 +70,47 @@ export default function RecruiterDashboard() {
 
   const loadData = async () => {
     setLoading(true);
+    console.log("--- DASHBOARD START LOADING ---");
     try {
-      const [vacanciesRes, statsRes] = await Promise.all([
-        vacancyAPI.getAll({ my: true }),
-        statsAPI.getRecruiterStats().catch(() => ({ data: null })),
-      ]);
-      setMyVacancies(vacanciesRes.data.content || []);
-      setStats(statsRes.data);
+      const vacanciesRes = await vacancyAPI.getAll({ my: true });
+
+      console.log("1. Что пришло с сервера (весь response):", vacanciesRes);
+      console.log("2. Данные (data):", vacanciesRes.data);
+
+      // Проверяем структуру (Spring Data Page или обычный List)
+      const data = vacanciesRes.data.content || vacanciesRes.data;
+      console.log("3. Итоговый массив для стейта:", data);
+
+      if (Array.isArray(data)) {
+        setMyVacancies(data);
+      } else {
+        console.error("ОШИБКА: Сервер вернул не массив! Проверь структуру ответа.");
+      }
+
     } catch (error) {
-      console.error('Ошибка загрузки:', error);
+      console.error('КРИТИЧЕСКАЯ ОШИБКА ЗАГРУЗКИ:', error);
     } finally {
       setLoading(false);
+      console.log("--- DASHBOARD END LOADING ---");
     }
   };
+
+  // const loadData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const [vacanciesRes, statsRes] = await Promise.all([
+  //       vacancyAPI.getAll(),
+  //       statsAPI.getRecruiterStats().catch(() => ({ data: null })),
+  //     ]);
+  //     console.log("Полный ответ от API:", vacanciesRes);
+  //     setMyVacancies(vacanciesRes.data.content || []);
+  //     setStats(statsRes.data);
+  //   } catch (error) {
+  //     console.error('Ошибка загрузки:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const loadApplications = async (vacancyId) => {
     setApplicationsLoading(true);
@@ -202,20 +230,18 @@ export default function RecruiterDashboard() {
             <div className="space-y-3 max-h-96 overflow-y-auto">
               {myVacancies.map((vacancy) => {
                 const statusInfo = getVacancyStatusLabel(vacancy.status);
+                console.log("Вакансия из списка:", vacancy);
                 return (
                   <div
-                    key={vacancy.id}
+                    key={vacancy.vacancyId}
                     className={`p-4 border rounded-lg cursor-pointer transition ${
-                      selectedVacancy === vacancy.id ? 'border-blue-600 bg-blue-50' : 'hover:border-blue-300'
+                      selectedVacancy === vacancy.vacancyId ? 'border-blue-600 bg-blue-50' : 'hover:border-blue-300'
                     }`}
-                    onClick={() => loadApplications(vacancy.id)}
+                    onClick={() => loadApplications(vacancy.vacancyId)}
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{vacancy.title}</h3>
-                        <p className="text-sm text-gray-500">
-                          {vacancy.location || 'Локация не указана'} • {getEmploymentTypeLabel(vacancy.employmentType)}
-                        </p>
                         <div className="flex gap-2 mt-2">
                           <span className={`text-xs px-2 py-1 rounded ${statusInfo.color}`}>
                             {statusInfo.text}
@@ -238,7 +264,7 @@ export default function RecruiterDashboard() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              closeVacancy(vacancy.id);
+                              closeVacancy(vacancy.vacancyId);
                             }}
                             className="text-red-600 hover:text-red-700 text-sm"
                             title="Закрыть вакансию"

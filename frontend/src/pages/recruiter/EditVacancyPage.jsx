@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { vacancyAPI, companyAPI } from '../../api/endpoints';
 
 export default function EditVacancyPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id;
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,11 +22,23 @@ export default function EditVacancyPage() {
     experienceLevel: 'NO_EXPERIENCE',
   });
 
+  console.log("--- DEBUG VACANCY EDIT ---");
+  console.log("Весь объект params:", params);
+  console.log("Значение id из params:", id);
+  console.log("Тип id:", typeof id);
+  console.log("--------------------------");
+
   useEffect(() => {
     loadData();
   }, [id]);
 
   const loadData = async () => {
+
+    if (!id || id === 'undefined') {
+      console.error("Критическая ошибка: ID вакансии не определен в URL");
+      return;
+    }
+
     setLoading(true);
     try {
       const [vacancyRes, companiesRes] = await Promise.all([

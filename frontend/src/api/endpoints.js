@@ -7,7 +7,7 @@ export const authAPI = {
 };
 
 export const vacancyAPI = {
-  getAll: (params) => apiClient.get('/vacancies', { params }),
+  getAll: () => apiClient.get('/vacancies'),
   getById: (id) => apiClient.get(`/vacancies/${id}`),
   create: (data) => apiClient.post('/vacancies', data),
   update: (id, data) => apiClient.put(`/vacancies/${id}`, data),
