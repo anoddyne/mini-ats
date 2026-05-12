@@ -3,7 +3,7 @@ import apiClient from './client';
 export const authAPI = {
   register: (data) => apiClient.post('/users/register', data),
   login: (data) => apiClient.post('auth/login', data),
-  updateProfile:(userId,updateData) => apiClient.put(`/users/${userId}`,updateData),
+  updateProfile:(updateData) => apiClient.put(`/users/me`,updateData),
 };
 
 export const vacancyAPI = {
