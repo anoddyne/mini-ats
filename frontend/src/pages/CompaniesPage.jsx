@@ -1,27 +1,55 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { companyAPI } from '../api/endpoints';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function CompaniesPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
+  const [myCompaniesIds, setMyCompaniesIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Загружаем данные после того, как user станет известен
   useEffect(() => {
-    loadCompanies();
-  }, []);
+    if (user) {
+      loadData();
+    } else {
+      // Если пользователь не загружен, не показываем лоадер бесконечно, можно установить loading=false
+      setLoading(false);
+    }
+  }, [user]); // <- ключевое изменение: зависимость от user
 
-  const loadCompanies = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
+      // Загружаем все компании
       const response = await companyAPI.getAll();
-      setCompanies(Array.isArray(response.data) ? response.data : response.data.content || []);
+      const allCompanies = Array.isArray(response.data) ? response.data : response.data.content || [];
+      setCompanies(allCompanies);
+
+      // Если пользователь рекрутер, загружаем список его компаний
+      if (user?.role === 'RECRUITER') {
+        const myCompaniesRes = await companyAPI.getMyCompanies();
+        const myCompanies = Array.isArray(myCompaniesRes.data) ? myCompaniesRes.data : myCompaniesRes.data.content || [];
+        setMyCompaniesIds(myCompanies.map(c => c.companyId));
+      }
     } catch (error) {
       console.error('Ошибка загрузки компаний:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (companyId) => {
+    if (!window.confirm('Вы уверены, что хотите удалить компанию? Это действие необратимо.')) return;
+    try {
+      await companyAPI.delete(companyId);
+      await loadData(); // обновим список после удаления
+    } catch (error) {
+      console.error('Ошибка удаления:', error);
+      alert('Не удалось удалить компанию');
     }
   };
 
@@ -44,7 +72,6 @@ export default function CompaniesPage() {
           )}
         </div>
 
-        {/* Поиск */}
         <div className="mb-6">
           <input
               type="text"
@@ -59,46 +86,66 @@ export default function CompaniesPage() {
             <div className="text-center py-12 text-gray-500">Компании не найдены</div>
         ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCompanies.map((company) => (
-                  <div key={company.companyId} className="border rounded-lg p-4 hover:shadow transition bg-white">
-                    {/* Логотип */}
-                    <div className="flex justify-center mb-4">
-                      {company.logoUrl ? (
-                          <img
-                              src={company.logoUrl}
-                              alt={company.name}
-                              className="h-24 w-24 object-contain rounded-full"
-                              onError={(e) => e.target.style.display = 'none'} // Скрыть, если картинка не загрузилась
-                          />
-                      ) : (
-                          <div className="h-24 w-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
-                            📄
+              {filteredCompanies.map((company) => {
+                const isOwner = user?.role === 'RECRUITER' && myCompaniesIds.includes(company.companyId);
+                return (
+                    <div key={company.companyId} className="border rounded-lg p-4 hover:shadow transition bg-white relative">
+                      {/* Логотип */}
+                      <div className="flex justify-center mb-4">
+                        {company.logoUrl ? (
+                            <img
+                                src={company.logoUrl}
+                                alt={company.name}
+                                className="h-24 w-24 object-contain rounded-full"
+                                onError={(e) => e.target.style.display = 'none'}
+                            />
+                        ) : (
+                            <div className="h-24 w-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                              📄
+                            </div>
+                        )}
+                      </div>
+
+                      <Link to={`/companies/${company.companyId}`} className="block">
+                        <h2 className="text-xl font-semibold text-center mb-2 hover:text-blue-600">
+                          {company.name}
+                        </h2>
+                      </Link>
+
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                        {company.description || 'Описание отсутствует'}
+                      </p>
+
+                      <div className="flex justify-center">
+                        <Link
+                            to={`/vacancies?companyId=${company.companyId}`}
+                            className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md hover:bg-blue-50 transition"
+                        >
+                          Вакансии компании
+                        </Link>
+                      </div>
+
+                      {isOwner && (
+                          <div className="absolute top-2 right-2 flex space-x-1">
+                            <button
+                                onClick={() => navigate(`/companies/edit/${company.companyId}`)}
+                                className="text-gray-500 hover:text-blue-600"
+                                title="Редактировать"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                                onClick={() => handleDelete(company.companyId)}
+                                className="text-gray-500 hover:text-red-600"
+                                title="Удалить"
+                            >
+                              🗑️
+                            </button>
                           </div>
                       )}
                     </div>
-
-                    {/* Информация */}
-                    <Link to={`/companies/${company.companyId}`} className="block">
-                      <h2 className="text-xl font-semibold text-center mb-2 hover:text-blue-600">
-                        {company.name}
-                      </h2>
-                    </Link>
-
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                      {company.description || 'Описание отсутствует'}
-                    </p>
-
-                    {/* Кнопка для перехода к вакансиям */}
-                    <div className="flex justify-center">
-                      <Link
-                          to={`/vacancies?companyId=${company.companyId}`}
-                          className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md hover:bg-blue-50 transition"
-                      >
-                        Вакансии компании
-                      </Link>
-                    </div>
-                  </div>
-              ))}
+                );
+              })}
             </div>
         )}
       </div>

@@ -9,13 +9,13 @@ import RecruiterDashboard from '../pages/recruiter/RecruiterDashboard';
 import ProfilePage from "../pages/ProfilePage.jsx";
 import VacancyDetailPage from "../pages/VacancyDetailPage.jsx";
 import CompaniesPage from "../pages/CompaniesPage.jsx";
+import EditCompanyPage from '../pages/EditCompanyPage';
 
 
 // Страницы для рекрутера
 import CreateVacancyPage from "../pages/recruiter/CreateVacancyPage.jsx";
 import EditVacancyPage from "../pages/recruiter/EditVacancyPage.jsx";
 import CreateCompanyPage from "../pages/recruiter/CreateCompanyPage.jsx";
-import EditCompanyPage from "../pages/recruiter/EditCompanyPage.jsx";
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user } = useAuth();
@@ -38,7 +38,7 @@ export default function AppRouter() {
             <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            
+            <Route path="/companies/edit/:id" element={<EditCompanyPage />} />
             {/* Общие для всех авторизованных */}
             <Route path="/profile" element={
               <ProtectedRoute>

@@ -45,9 +45,12 @@ public class CompanyController {
     }
 
     @Operation(summary = "Обновить информацию о компании по id")
-    @PutMapping("/{id}")
-    public ResponseEntity<CompanyResponseDTO> updateCompany(@PathVariable Integer id, @Valid @RequestBody CompanyRequestDTO dto) {
-        return new ResponseEntity<>(companyService.updateCompany(id, dto), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CompanyResponseDTO> updateCompany(
+            @RequestPart(name = "logo",required = false) MultipartFile file,
+            @RequestPart(name = "dto",required = false) CompanyRequestDTO dto,
+            @PathVariable Integer id) {
+        return new ResponseEntity<>(companyService.updateCompany(dto, file,id), HttpStatus.OK);
     }
 
     @Operation(summary = "Удалить компанию по id")

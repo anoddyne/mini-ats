@@ -67,12 +67,31 @@ public class CompanyService {
     }
 
     @Transactional
-    public CompanyResponseDTO updateCompany(Integer id, CompanyRequestDTO dto) {
+    public CompanyResponseDTO updateCompany(CompanyRequestDTO dto, MultipartFile logo, Integer id) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Компания с id " + id + " не найдена"));
-        companyMapper.updateEntityFromDto(dto, company);
-        Company updatedCompany = companyRepository.save(company);
-        return companyMapper.toResponseDto(updatedCompany);
+
+        company.setName(dto.name());
+        company.setDescription(dto.description());
+
+        if (logo != null && !logo.isEmpty()) {
+            String oldFileName = company.getFileName();
+            if (oldFileName != null && !oldFileName.isEmpty()) {
+                fileService.deleteFile(fileService.getCompanyBucketName(), oldFileName);
+            }
+            String newFileName = fileService.uploadFile(logo, login, fileService.getCompanyBucketName());
+            String newLogoUrl = fileService.getPublicFileUrl(fileService.getCompanyBucketName(), newFileName);
+
+            company.setFileName(newFileName);
+            company.setLogoUrl(newLogoUrl);
+        }
+
+        Company savedCompany = companyRepository.save(company);
+        return companyMapper.toResponseDto(savedCompany);
     }
 
     @Transactional(readOnly = true)
