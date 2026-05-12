@@ -6,6 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import ru.practice.mini_ats.dto.User.UserRequestDTO;
 import ru.practice.mini_ats.dto.User.UserResponseDTO;
+import ru.practice.mini_ats.dto.User.UserUpdateDTO;
 import ru.practice.mini_ats.models.User;
 
 @Mapper(componentModel = "spring")
@@ -22,5 +23,5 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "active", ignore = true)
     @Mapping(target = "role", ignore = true)
-    void updateEntityFromDto(UserRequestDTO dto, @MappingTarget User user);
+    void updateEntityFromDto(UserUpdateDTO dto, @MappingTarget User user);
 }

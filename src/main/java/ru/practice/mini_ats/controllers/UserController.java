@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practice.mini_ats.dto.User.UserRequestDTO;
 import ru.practice.mini_ats.dto.User.UserResponseDTO;
+import ru.practice.mini_ats.dto.User.UserUpdateDTO;
 import ru.practice.mini_ats.models.enums.UserRole;
 import ru.practice.mini_ats.services.UserService;
 
@@ -40,9 +41,9 @@ public class UserController {
     }
 
     @Operation(summary = "Обновить информацию о пользователе по id")
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @Valid @RequestBody UserRequestDTO dto) {
-        return new ResponseEntity<>(userService.updateUser(id, dto), HttpStatus.OK);
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserUpdateDTO dto) {
+        return new ResponseEntity<>(userService.updateUser(dto), HttpStatus.OK);
     }
 
     @Operation(summary = "Обновить роль пользователя по id")

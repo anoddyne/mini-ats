@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../api/endpoints';
 
 export default function ProfilePage() {
-  const { user, login } = useAuth();
+  const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -51,25 +51,19 @@ export default function ProfilePage() {
 
     setLoading(true);
     try {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
       const updateData = {
         name: formData.name,
         surname: formData.surname,
         patronymic: formData.patronymic,
-        age: formData.age,
+        age: parseInt(formData.age),
         phoneNumber: formData.phoneNumber,
         email: formData.email,
         login: formData.login,
+        password: passwordData.newPassword || null
       };
 
-      if (passwordData.newPassword) {
-        updateData.password = passwordData.newPassword;
-      }
-
-      const userId = storedUser?.userId;
-      await authAPI.updateProfile(userId, updateData);
-      // После обновления профиля, если логин не менялся, повторно логинимся, чтобы обновить контекст новыми данными
-      await login({ login: formData.login, password: passwordData.newPassword || storedUser.password });
+      const response = await authAPI.updateProfile(updateData);
+      updateUser(response.data);
       alert('Профиль обновлён!');
       // Очищаем поля пароля
       setPasswordData({ newPassword: '', confirmPassword: '' });
