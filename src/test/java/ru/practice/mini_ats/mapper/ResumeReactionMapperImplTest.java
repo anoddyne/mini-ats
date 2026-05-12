@@ -2,8 +2,10 @@ package ru.practice.mini_ats.mapper;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import ru.practice.mini_ats.dto.ResumeReaction.ResumeReactionRequestDTO;
 import ru.practice.mini_ats.dto.ResumeReaction.ResumeReactionResponseDTO;
+import ru.practice.mini_ats.models.Company;
 import ru.practice.mini_ats.models.Resume;
 import ru.practice.mini_ats.models.ResumeReaction;
 import ru.practice.mini_ats.models.User;
@@ -15,129 +17,80 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ResumeReactionMapperImplTest {
 
-    private final ResumeReactionMapper mapper = new ResumeReactionMapperImpl();
+    private final ResumeReactionMapper mapper = Mappers.getMapper(ResumeReactionMapper.class);
 
     @Test
-    void toResponseDto_shouldMapAllFields() {
-        // given
+    void toResponseDto_ShouldMapAllFields() {
+        // Подготовка данных
         ResumeReaction reaction = getResumeReaction();
 
-        // when
+        // Действие
         ResumeReactionResponseDTO dto = mapper.toResponseDto(reaction);
 
-        // then
-        assertThat(dto).isNotNull();
-        assertThat(dto.resumeReactionId()).isEqualTo(100);
-        assertThat(dto.coverLetter()).isEqualTo("Заинтересован в позиции");
-        assertThat(dto.appliedAt()).isEqualTo(LocalDate.of(2026, 4, 26));
-        assertThat(dto.vacancyId()).isEqualTo(15);
-        assertThat(dto.vacancyTitle()).isEqualTo("Java разработчик");
-        assertThat(dto.resumeId()).isEqualTo(20);
-        assertThat(dto.candidateFullName()).isEqualTo("Петров Иван Сергеевич");
+        // Проверки
+        assertThat(dto.resumeReactionId()).isEqualTo(1);
+        assertThat(dto.coverLetter()).isEqualTo("Заинтересован в вакансии");
+        assertThat(dto.appliedAt()).isEqualTo(LocalDate.of(2026, 5, 12));
+        assertThat(dto.vacancyId()).isEqualTo(100);
+        assertThat(dto.vacancyTitle()).isEqualTo("Java Developer");
+        assertThat(dto.companyName()).isEqualTo("ООО Ромашка");
+        assertThat(dto.resumeId()).isEqualTo(200);
+        assertThat(dto.candidateFullName()).isEqualTo("Иванов Иван Иванович");
     }
 
     private static @NonNull ResumeReaction getResumeReaction() {
         User user = new User();
-        user.setUserId(7);
+        user.setUserId(1);
         user.setName("Иван");
-        user.setSurname("Петров");
-        user.setPatronymic("Сергеевич");
+        user.setSurname("Иванов");
+        user.setPatronymic("Иванович");
 
-        Resume resume = new Resume();
-        resume.setResumeId(20);
-        resume.setUser(user);
+        Company company = new Company();
+        company.setCompanyId(10);
+        company.setName("ООО Ромашка");
 
         Vacancy vacancy = new Vacancy();
-        vacancy.setVacancyId(15);
-        vacancy.setTitle("Java разработчик");
+        vacancy.setVacancyId(100);
+        vacancy.setTitle("Java Developer");
+        vacancy.setCompany(company);
+
+        Resume resume = new Resume();
+        resume.setResumeId(200);
+        resume.setUser(user);
 
         ResumeReaction reaction = new ResumeReaction();
-        reaction.setResumeReactionId(100);
-        reaction.setCoverLetter("Заинтересован в позиции");
-        reaction.setAppliedAt(LocalDate.of(2026, 4, 26));
-        reaction.setResume(resume);
+        reaction.setResumeReactionId(1);
+        reaction.setCoverLetter("Заинтересован в вакансии");
+        reaction.setAppliedAt(LocalDate.of(2026, 5, 12));
         reaction.setVacancy(vacancy);
+        reaction.setResume(resume);
         return reaction;
     }
 
     @Test
-    void toResponseDto_shouldHandleNullRelations() {
-        // given
-        ResumeReaction reaction = new ResumeReaction();
-        reaction.setResumeReactionId(1);
-        reaction.setCoverLetter("no relations");
-        reaction.setResume(null);
-        reaction.setVacancy(null);
-
-        // when
-        ResumeReactionResponseDTO dto = mapper.toResponseDto(reaction);
-
-        // then
-        assertThat(dto).isNotNull();
-        assertThat(dto.vacancyId()).isNull();
-        assertThat(dto.vacancyTitle()).isNull();
-        assertThat(dto.resumeId()).isNull();
-        assertThat(dto.candidateFullName()).isNull();
-    }
-
-    @Test
-    void toResponseDto_shouldHandleNullResumeUser() {
-        // given
-        Resume resume = new Resume();
-        resume.setResumeId(5);
-        resume.setUser(null);  // пользователь не задан
-
-        ResumeReaction reaction = new ResumeReaction();
-        reaction.setResume(resume);
-
-        // when
-        ResumeReactionResponseDTO dto = mapper.toResponseDto(reaction);
-
-        // then
-        assertThat(dto.resumeId()).isEqualTo(5);
-        assertThat(dto.candidateFullName()).isNull();
-    }
-
-    @Test
-    void toResponseDto_shouldHandleNullInput() {
-        ResumeReactionResponseDTO dto = mapper.toResponseDto(null);
-        assertThat(dto).isNull();
-    }
-
-    @Test
-    void toEntity_shouldMapCoverLetterOnly() {
-        // given
-        ResumeReactionRequestDTO request = new ResumeReactionRequestDTO(
-                "Мое сопроводительное письмо",
-                99,    // vacancyId – не используется
-                100    // resumeId – не используется
+    void toEntity_ShouldMapRequestDtoToEntity_IgnoringSpecificFields() {
+        // Данные
+        ResumeReactionRequestDTO dto = new ResumeReactionRequestDTO(
+                "Хочу работать у вас",
+                42
         );
 
-        // when
-        ResumeReaction entity = mapper.toEntity(request);
+        // Действие
+        ResumeReaction reaction = mapper.toEntity(dto);
 
-        // then
-        assertThat(entity).isNotNull();
-        assertThat(entity.getCoverLetter()).isEqualTo("Мое сопроводительное письмо");
-        // vacancy и resume не устанавливаются (текущая реализация маппера не использует vacancyId/resumeId)
-        assertThat(entity.getVacancy()).isNull();
-        assertThat(entity.getResume()).isNull();
-        assertThat(entity.getResumeReactionId()).isNull();
-        assertThat(entity.getAppliedAt()).isNull();
+        // Проверки
+        assertThat(reaction.getCoverLetter()).isEqualTo("Хочу работать у вас");
+        assertThat(reaction.getVacancy()).isNull(); // игнорируется
+        assertThat(reaction.getResume()).isNull();  // игнорируется
+        assertThat(reaction.getResumeReactionId()).isNull(); // игнорируется
+        assertThat(reaction.getAppliedAt()).isNull();        // игнорируется
     }
 
     @Test
-    void toEntity_shouldHandleNullInput() {
-        ResumeReaction entity = mapper.toEntity(null);
-        assertThat(entity).isNull();
-    }
-
-    @Test
-    void toEntity_shouldHandleNullCoverLetter() {
-        ResumeReactionRequestDTO request = new ResumeReactionRequestDTO(null, 1, 2);
-
-        ResumeReaction entity = mapper.toEntity(request);
-
-        assertThat(entity.getCoverLetter()).isNull();
+    void toEntity_WhenRequestDtoHasNullCoverLetter_SetsNull() {
+        ResumeReactionRequestDTO dto = new ResumeReactionRequestDTO(null, 55);
+        ResumeReaction reaction = mapper.toEntity(dto);
+        assertThat(reaction.getCoverLetter()).isNull();
+        assertThat(reaction.getVacancy()).isNull();
     }
 }

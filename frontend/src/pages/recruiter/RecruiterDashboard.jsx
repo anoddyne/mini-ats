@@ -116,10 +116,21 @@ export default function RecruiterDashboard() {
     setApplicationsLoading(true);
     try {
       const response = await applicationAPI.getByVacancy(vacancyId);
-      setApplications(response.data);
+      let apps = response.data;
+      // Если ответ — объект страницы (с content), берем content
+      if (apps && !Array.isArray(apps) && apps.content) {
+        apps = apps.content;
+      }
+      if (Array.isArray(apps)) {
+        setApplications(apps);
+      } else {
+        console.error("Отклики не массив:", apps);
+        setApplications([]);
+      }
       setSelectedVacancy(vacancyId);
     } catch (error) {
       console.error('Ошибка загрузки откликов:', error);
+      setApplications([]);
     } finally {
       setApplicationsLoading(false);
     }
@@ -253,7 +264,7 @@ export default function RecruiterDashboard() {
                       </div>
                       <div className="flex gap-2">
                         <Link
-                          to={`/recruiter/vacancies/${vacancy.id}/edit`}
+                          to={`/recruiter/vacancies/${vacancy.vacancyId}/edit`}
                           onClick={(e) => e.stopPropagation()}
                           className="text-yellow-600 hover:text-yellow-700 text-sm"
                           title="Редактировать"
@@ -320,7 +331,7 @@ export default function RecruiterDashboard() {
                               📄 Скачать резюме
                             </a>
                           )}
-                          
+
                           {app.status === 'SCHEDULED' && (
                             <div className="mt-3">
                               <label className="text-xs text-gray-500 mr-2">Тип собеседования:</label>

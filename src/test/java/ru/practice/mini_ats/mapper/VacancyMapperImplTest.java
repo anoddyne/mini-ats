@@ -32,7 +32,7 @@ class VacancyMapperImplTest {
         assertThat(dto.employmentType()).isEqualTo(EmploymentType.HYBRID);
         assertThat(dto.status()).isEqualTo(VacancyStatus.CLOSED);
         assertThat(dto.requiredSkills()).isEqualTo("Java, Spring");
-        assertThat(dto.experienceLevel()).isEqualTo(1);
+        assertThat(dto.experienceLevel()).isEqualTo(ExperienceLevel.JUNIOR);
         assertThat(dto.companyId()).isEqualTo(1);
         assertThat(dto.companyName()).isEqualTo("Tech Corp");
     }

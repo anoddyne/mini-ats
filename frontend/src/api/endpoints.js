@@ -28,7 +28,7 @@ export const companyAPI = {
 
 export const applicationAPI = {
   getMyApplications: () => apiClient.get(`/reactions/my`),
-  getByVacancy: (vacancyId) => apiClient.get(`/applications/vacancy/${vacancyId}`),
+  getByVacancy: (vacancyId) => apiClient.get(`/vacancies/${vacancyId}`),
   create: (data) => apiClient.post(`/reactions/apply`, data),
   updateStatus: (applicationId, status) => apiClient.patch(`/applications/${applicationId}/status`, { status }),
   updateInterviewType: (applicationId, interviewType) => apiClient.patch(`/applications/${applicationId}/interview-type`, { interviewType }),

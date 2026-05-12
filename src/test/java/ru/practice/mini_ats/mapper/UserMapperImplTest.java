@@ -1,10 +1,10 @@
 package ru.practice.mini_ats.mapper;
 
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import ru.practice.mini_ats.dto.User.UserRequestDTO;
 import ru.practice.mini_ats.dto.User.UserResponseDTO;
+import ru.practice.mini_ats.dto.User.UserUpdateDTO;
 import ru.practice.mini_ats.models.User;
 import ru.practice.mini_ats.models.enums.UserRole;
 
@@ -26,6 +26,7 @@ class UserMapperImplTest {
         user.setEmail("john@example.com");
         user.setLogin("johndoe");
         user.setRole(UserRole.CANDIDATE);
+        user.setActive(true);
 
         UserResponseDTO dto = mapper.toResponseDto(user);
 
@@ -41,7 +42,7 @@ class UserMapperImplTest {
     }
 
     @Test
-    void toEntity_ShouldMapRequestDtoToUser_IgnoringSpecificFields() {
+    void toEntity_ShouldMapRequestDtoToUser_IgnoringUserIdRoleActive() {
         UserRequestDTO dto = new UserRequestDTO(
                 "Alice", "Johnson", "Marie", 25, "+987654321",
                 "alice@example.com", "alice123", "securePass", UserRole.ADMIN
@@ -58,68 +59,69 @@ class UserMapperImplTest {
         assertThat(user.getLogin()).isEqualTo("alice123");
         assertThat(user.getPassword()).isEqualTo("securePass");
 
-        // Поля, которые должны игнорироваться
-        assertThat(user.getUserId()).isNull();     // игнорируется
-        assertThat(user.getRole()).isNull();       // игнорируется
+        assertThat(user.getUserId()).isNull();
+        assertThat(user.getRole()).isNull();
     }
 
     @Test
-    void updateEntityFromDto_ShouldUpdateExistingUser_IgnoringSpecificFields() {
-        User existingUser = getUser();
+    void updateEntityFromDto_ShouldUpdateExistingUser_IgnoringUserIdPasswordActiveRole() {
+        User existing = new User();
+        existing.setUserId(10);
+        existing.setName("Old");
+        existing.setSurname("OldSurname");
+        existing.setPatronymic("OldPatr");
+        existing.setAge(20);
+        existing.setPhoneNumber("000");
+        existing.setEmail("old@example.com");
+        existing.setLogin("oldlogin");
+        existing.setPassword("oldpass");
+        existing.setRole(UserRole.CANDIDATE);
+        existing.setActive(true);
 
-        UserRequestDTO dto = new UserRequestDTO(
+        UserUpdateDTO dto = new UserUpdateDTO(
                 "NewName", "NewSurname", "NewPatr", 30, "111",
-                "new@example.com", "newlogin", "newpass", UserRole.ADMIN
+                "new@example.com", "newpass"
         );
 
-        mapper.updateEntityFromDto(dto, existingUser);
+        mapper.updateEntityFromDto(dto, existing);
 
         // Обновляемые поля
-        assertThat(existingUser.getName()).isEqualTo("NewName");
-        assertThat(existingUser.getSurname()).isEqualTo("NewSurname");
-        assertThat(existingUser.getPatronymic()).isEqualTo("NewPatr");
-        assertThat(existingUser.getAge()).isEqualTo(30);
-        assertThat(existingUser.getPhoneNumber()).isEqualTo("111");
-        assertThat(existingUser.getEmail()).isEqualTo("new@example.com");
-        assertThat(existingUser.getLogin()).isEqualTo("newlogin");
-        
-        assertThat(existingUser.getPassword()).isEqualTo("oldpass");
-        assertThat(existingUser.getUserId()).isEqualTo(10);
-        assertThat(existingUser.getRole()).isEqualTo(UserRole.CANDIDATE);
-    }
-
-    private static @NonNull User getUser() {
-        User existingUser = new User();
-        existingUser.setUserId(10);
-        existingUser.setName("Old");
-        existingUser.setSurname("OldSurname");
-        existingUser.setPatronymic("OldPatr");
-        existingUser.setAge(18);
-        existingUser.setPhoneNumber("000");
-        existingUser.setEmail("old@example.com");
-        existingUser.setLogin("oldlogin");
-        existingUser.setPassword("oldpass");
-        existingUser.setRole(UserRole.CANDIDATE);
-        existingUser.setActive(true);
-        return existingUser;
+        assertThat(existing.getName()).isEqualTo("NewName");
+        assertThat(existing.getSurname()).isEqualTo("NewSurname");
+        assertThat(existing.getPatronymic()).isEqualTo("NewPatr");
+        assertThat(existing.getAge()).isEqualTo(30);
+        assertThat(existing.getPhoneNumber()).isEqualTo("111");
+        assertThat(existing.getEmail()).isEqualTo("new@example.com");
+        // Игнорируемые поля
+        assertThat(existing.getUserId()).isEqualTo(10);
+        assertThat(existing.getPassword()).isEqualTo("oldpass");
+        assertThat(existing.getRole()).isEqualTo(UserRole.CANDIDATE);
+        assertThat(existing.getLogin()).isEqualTo("oldlogin");
     }
 
     @Test
-    void toEntity_WhenDtoHasNullFields_ShouldSetNullInEntity() {
-        UserRequestDTO dto = new UserRequestDTO(
-                "Bob", "Builder", null, null, null,
-                "bob@example.com", "bob", "pass", UserRole.CANDIDATE
+    void updateEntityFromDto_WhenDtoHasNullFields_ShouldSetNullInEntity() {
+        User existing = new User();
+        existing.setName("OldName");
+        existing.setSurname("OldSurname");
+        existing.setPatronymic("OldPatr");
+        existing.setAge(25);
+        existing.setPhoneNumber("123");
+        existing.setEmail("old@example.com");
+        existing.setPassword("oldpass");
+
+        UserUpdateDTO dto = new UserUpdateDTO(
+                "NewName", null, null, null, null, "new@example.com", null
         );
 
-        User user = mapper.toEntity(dto);
+        mapper.updateEntityFromDto(dto, existing);
 
-        assertThat(user.getName()).isEqualTo("Bob");
-        assertThat(user.getSurname()).isEqualTo("Builder");
-        assertThat(user.getPatronymic()).isNull();
-        assertThat(user.getAge()).isNull();
-        assertThat(user.getPhoneNumber()).isNull();
-        assertThat(user.getEmail()).isEqualTo("bob@example.com");
-        assertThat(user.getLogin()).isEqualTo("bob");
-        assertThat(user.getPassword()).isEqualTo("pass");
+        assertThat(existing.getName()).isEqualTo("NewName");
+        assertThat(existing.getSurname()).isNull();
+        assertThat(existing.getPatronymic()).isNull();
+        assertThat(existing.getAge()).isNull();
+        assertThat(existing.getPhoneNumber()).isNull();
+        assertThat(existing.getEmail()).isEqualTo("new@example.com");
+        assertThat(existing.getPassword()).isEqualTo("oldpass");
     }
 }

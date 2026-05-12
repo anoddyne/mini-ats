@@ -51,8 +51,7 @@ class CompanyMapperImplTest {
     void toEntity_shouldMapAllFields() {
         CompanyRequestDTO request = new CompanyRequestDTO(
                 "New Company",
-                "Innovative startup",
-                "https://startup.com/logo.jpg"
+                "Innovative startup"
         );
 
         Company entity = mapper.toEntity(request);
@@ -60,7 +59,7 @@ class CompanyMapperImplTest {
         assertThat(entity.getCompanyId()).isNull(); // ID is generated, not set from DTO
         assertThat(entity.getName()).isEqualTo("New Company");
         assertThat(entity.getDescription()).isEqualTo("Innovative startup");
-        assertThat(entity.getLogoUrl()).isEqualTo("https://startup.com/logo.jpg");
+        assertThat(entity.getLogoUrl()).isEqualTo(null);
     }
 
     @Test
@@ -73,7 +72,6 @@ class CompanyMapperImplTest {
     void toEntity_shouldHandleNullOptionalFields() {
         CompanyRequestDTO request = new CompanyRequestDTO(
                 "Minimal Company",
-                null,
                 null
         );
 

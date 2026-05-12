@@ -7,8 +7,5 @@ public record ResumeReactionRequestDTO(
 
         @NotNull(message = "Выберите вакансию")
         Integer vacancyId
-
-//        @NotNull(message = "Выберите резюме")
-//        Integer resumeId
 ) {
 }
