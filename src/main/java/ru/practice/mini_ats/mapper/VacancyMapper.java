@@ -12,6 +12,7 @@ public interface VacancyMapper {
 
     @Mapping(source = "company.companyId", target = "companyId")
     @Mapping(source = "company.name", target = "companyName")
+    @Mapping(source = "applicationsCount", target = "applicationsCount")
     VacancyResponseDTO toResponseDto(Vacancy vacancy);
 
     @Mapping(target = "vacancyId", ignore = true)

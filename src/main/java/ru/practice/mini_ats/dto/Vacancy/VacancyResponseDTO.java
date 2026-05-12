@@ -17,6 +17,7 @@ public record VacancyResponseDTO(
         String requiredSkills,
         ExperienceLevel experienceLevel,
         Integer companyId,
-        String companyName
+        String companyName,
+        int applicationsCount
 ) {
 }

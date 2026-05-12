@@ -3,6 +3,7 @@ package ru.practice.mini_ats.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.SoftDeleteType;
 import ru.practice.mini_ats.models.enums.EmploymentType;
@@ -54,4 +55,7 @@ public class Vacancy {
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "company_id", nullable = false)
     private Company company;
+
+    @Formula("(SELECT count(*) FROM resume_reactions r WHERE r.vacancy_id = vacancy_id)")
+    private int applicationsCount;
 }

@@ -258,7 +258,7 @@ export default function RecruiterDashboard() {
                             {statusInfo.text}
                           </span>
                           <span className="text-xs text-gray-500">
-                            📊 {vacancy.applicationsCount || 0} откликов
+                            📊 {vacancy.applicationCount || 0} откликов
                           </span>
                         </div>
                       </div>
