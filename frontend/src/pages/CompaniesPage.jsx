@@ -17,7 +17,7 @@ export default function CompaniesPage() {
     setLoading(true);
     try {
       const response = await companyAPI.getAll();
-      setCompanies(response.data.content || []);
+      setCompanies(Array.isArray(response.data) ? response.data : response.data.content || []);
     } catch (error) {
       console.error('Ошибка загрузки компаний:', error);
     } finally {
@@ -63,16 +63,10 @@ export default function CompaniesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCompanies.map((company) => (
-            <div key={company.id} className="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
+            <div key={company.companyId} className="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">{company.name}</h2>
-                  {company.industry && (
-                    <p className="text-sm text-gray-500 mt-1">🏭 {company.industry}</p>
-                  )}
-                  {company.location && (
-                    <p className="text-sm text-gray-500">📍 {company.location}</p>
-                  )}
                 </div>
                 {user?.role === 'RECRUITER' && user.id === company.ownerId && (
                   <Link
@@ -89,22 +83,6 @@ export default function CompaniesPage() {
                   {company.description}
                 </p>
               )}
-              
-              {company.website && (
-                <a
-                  href={company.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 text-sm hover:underline mt-2 inline-block"
-                >
-                  🌐 {company.website}
-                </a>
-              )}
-              
-              <div className="mt-3 text-xs text-gray-400">
-                {company.email && <span>📧 {company.email}</span>}
-                {company.phone && <span className="ml-3">📞 {company.phone}</span>}
-              </div>
             </div>
           ))}
         </div>

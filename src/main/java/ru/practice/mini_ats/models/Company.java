@@ -7,6 +7,9 @@ import lombok.Setter;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.SoftDeleteType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -28,4 +31,12 @@ public class Company {
 
     @Column(name = "logo_url")
     private String logoUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "company_recruiters",
+            joinColumns = @JoinColumn(name = "company_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> recruiters = new HashSet<>();
 }

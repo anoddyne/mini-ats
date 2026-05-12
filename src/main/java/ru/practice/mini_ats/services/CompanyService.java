@@ -9,7 +9,10 @@ import ru.practice.mini_ats.dto.Company.CompanyRequestDTO;
 import ru.practice.mini_ats.dto.Company.CompanyResponseDTO;
 import ru.practice.mini_ats.mapper.CompanyMapper;
 import ru.practice.mini_ats.models.Company;
+import ru.practice.mini_ats.models.User;
 import ru.practice.mini_ats.repositories.CompanyRepository;
+import ru.practice.mini_ats.repositories.UserRepository;
+import ru.practice.mini_ats.security.SecurityUtils;
 
 import java.util.List;
 
@@ -18,12 +21,16 @@ import java.util.List;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
+    private final UserRepository userRepository;
 
     @Transactional
     public CompanyResponseDTO createCompany(CompanyRequestDTO dto) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User recruiter = userRepository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
         Company company = companyMapper.toEntity(dto);
-        Company savedCompany = companyRepository.save(company);
-        return companyMapper.toResponseDto(savedCompany);
+        company.getRecruiters().add(recruiter);
+        return companyMapper.toResponseDto(companyRepository.save(company));
     }
 
     @Transactional(readOnly = true)
@@ -55,5 +62,14 @@ public class CompanyService {
         companyMapper.updateEntityFromDto(dto, company);
         Company updatedCompany = companyRepository.save(company);
         return companyMapper.toResponseDto(updatedCompany);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanyResponseDTO> getMyCompanies() {
+        String login = SecurityUtils.getCurrentUserLogin();
+        return companyRepository.findAllByRecruiterLogin(login)
+                .stream()
+                .map(companyMapper::toResponseDto)
+                .toList();
     }
 }

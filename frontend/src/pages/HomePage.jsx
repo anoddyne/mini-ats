@@ -15,8 +15,8 @@ export default function HomePage() {
   const [filters, setFilters] = useState({
     page: 0,
     size: 10,
-    sortBy: 'createdAt',
-    direction: 'DESC',
+    //sortBy: 'createdAt',
+    //direction: 'DESC',
   });
 
   // Текстовый поиск

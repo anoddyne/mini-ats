@@ -29,7 +29,14 @@ export default function CreateVacancyPage() {
     setCompaniesLoading(true);
     try {
       const response = await companyAPI.getMyCompanies(); // Только мои компании
-      setCompanies(response.data || []);
+      console.log('Ответ от сервера:', response.data); // Посмотри в консоль F12, что прилетает!
+
+      // Если пришел массив — берем его, если объект Page — берем .content
+      const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.content || [];
+
+      setCompanies(data);
     } catch (error) {
       console.error('Ошибка загрузки компаний:', error);
     } finally {
@@ -98,7 +105,7 @@ export default function CreateVacancyPage() {
               >
                 <option value="">-- Выберите компанию --</option>
                 {companies.map(company => (
-                  <option key={company.id} value={company.id}>
+                  <option key={company.companyId} value={company.companyId}>
                     {company.name}
                   </option>
                 ))}

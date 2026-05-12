@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.practice.mini_ats.dto.Company.CompanyRequestDTO;
 import ru.practice.mini_ats.dto.Company.CompanyResponseDTO;
@@ -22,6 +23,7 @@ public class CompanyController {
 
     @Operation(summary = "Создать новую компанию")
     @PostMapping
+    @PreAuthorize("hasRole('RECRUITER')")
     public ResponseEntity<CompanyResponseDTO> createCompany(@Valid @RequestBody CompanyRequestDTO dto) {
         return new ResponseEntity<>(companyService.createCompany(dto), HttpStatus.CREATED);
     }
@@ -49,5 +51,11 @@ public class CompanyController {
     public ResponseEntity<Void> deleteCompany(@PathVariable Integer id){
         companyService.deleteCompany(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Получить компании, в которых я являюсь рекрутером")
+    @GetMapping("/my")
+    public ResponseEntity<List<CompanyResponseDTO>> getMyCompanies() {
+        return ResponseEntity.ok(companyService.getMyCompanies());
     }
 }

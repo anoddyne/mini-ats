@@ -10,6 +10,7 @@ import ru.practice.mini_ats.models.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
@@ -54,4 +55,6 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return user.isActive();
     }
+
+
 }
