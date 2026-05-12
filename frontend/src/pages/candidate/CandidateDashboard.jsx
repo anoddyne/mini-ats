@@ -42,10 +42,8 @@ export default function CandidateDashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const userId = user?.userId;
       const [applicationsRes, resumeRes] = await Promise.all([
-        applicationAPI.getMyApplications(userId).catch(() => ({ data: [] })),
+        applicationAPI.getMyApplications().catch(() => ({ data: [] })),
         resumeAPI.getMyResume().catch(() => ({ data: null })),
       ]);
       setApplications(applicationsRes.data);

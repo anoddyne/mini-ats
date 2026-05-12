@@ -36,8 +36,8 @@ public class ResumeReactionController {
 
     // Кандидат смотрит историю своих откликов по ID своего резюме
     @Operation(summary = "Получить список откликов по id резюме")
-    @GetMapping("/resume/{resumeId}")
-    public ResponseEntity<List<ResumeReactionResponseDTO>> getResumeReactionsByResumeId(@PathVariable Integer resumeId) {
-        return ResponseEntity.ok(resumeReactionService.getMyReactions(resumeId));
+    @GetMapping("/my")
+    public ResponseEntity<List<ResumeReactionResponseDTO>> getResumeReactionsByResumeId() {
+        return ResponseEntity.ok(resumeReactionService.getMyReactions());
     }
 }

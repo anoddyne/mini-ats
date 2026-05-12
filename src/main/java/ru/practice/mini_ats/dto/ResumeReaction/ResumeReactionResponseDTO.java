@@ -8,6 +8,7 @@ public record ResumeReactionResponseDTO(
         LocalDate appliedAt,
         Integer vacancyId,
         String vacancyTitle,
+        String companyName,
         Integer resumeId,
         String candidateFullName
 ) {

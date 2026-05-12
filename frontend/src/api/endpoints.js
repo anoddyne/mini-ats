@@ -27,9 +27,9 @@ export const companyAPI = {
 };
 
 export const applicationAPI = {
-  getMyApplications: () => apiClient.get('/applications/my'),
+  getMyApplications: () => apiClient.get(`/reactions/my`),
   getByVacancy: (vacancyId) => apiClient.get(`/applications/vacancy/${vacancyId}`),
-  create: (vacancyId, data) => apiClient.post(`/applications/vacancy/${vacancyId}`, data),
+  create: (data) => apiClient.post(`/reactions/apply`, data),
   updateStatus: (applicationId, status) => apiClient.patch(`/applications/${applicationId}/status`, { status }),
   updateInterviewType: (applicationId, interviewType) => apiClient.patch(`/applications/${applicationId}/interview-type`, { interviewType }),
   cancel: (applicationId) => apiClient.delete(`/applications/${applicationId}`),

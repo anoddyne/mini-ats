@@ -58,7 +58,10 @@ export default function VacancyDetailPage() {
     }
     setApplying(true);
     try {
-      await applicationAPI.create(id, { coverLetter });
+      await applicationAPI.create({
+        coverLetter: coverLetter,
+        vacancyId: id
+      });
       alert('Отклик успешно отправлен!');
       setShowApplyForm(false);
       setCoverLetter('');
