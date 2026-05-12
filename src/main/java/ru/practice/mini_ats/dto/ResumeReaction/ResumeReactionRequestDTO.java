@@ -6,9 +6,9 @@ public record ResumeReactionRequestDTO(
         String coverLetter,
 
         @NotNull(message = "Выберите вакансию")
-        Integer vacancyId,
+        Integer vacancyId
 
-        @NotNull(message = "Выберите резюме")
-        Integer resumeId
+//        @NotNull(message = "Выберите резюме")
+//        Integer resumeId
 ) {
 }

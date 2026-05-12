@@ -13,6 +13,7 @@ public interface ResumeReactionMapper {
     @Mapping(source = "vacancy.vacancyId", target = "vacancyId")
     @Mapping(source = "vacancy.title", target = "vacancyTitle")
     @Mapping(source = "resume.resumeId", target = "resumeId")
+    @Mapping(target = "companyName", source = "vacancy.company.name")
     @Mapping(source = "resume.user.fullName", target = "candidateFullName")
     ResumeReactionResponseDTO toResponseDto(ResumeReaction reaction);
 

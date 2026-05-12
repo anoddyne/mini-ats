@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practice.mini_ats.dto.User.UserRequestDTO;
 import ru.practice.mini_ats.dto.User.UserResponseDTO;
+import ru.practice.mini_ats.dto.User.UserUpdateDTO;
 import ru.practice.mini_ats.mapper.UserMapper;
 import ru.practice.mini_ats.models.User;
 import ru.practice.mini_ats.models.enums.UserRole;
 import ru.practice.mini_ats.repositories.UserRepository;
+import ru.practice.mini_ats.security.SecurityUtils;
 
 import java.util.List;
 
@@ -66,12 +68,15 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO updateUser(Integer userId, UserRequestDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Пользователь с id " + userId + " не найден"));
+    public UserResponseDTO updateUser(UserUpdateDTO dto) {
+        String login = SecurityUtils.getCurrentUserLogin();
+        User user = userRepository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+        if (dto.password() != null && !dto.password().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.password()));
+        }
         userMapper.updateEntityFromDto(dto, user);
-        User updatedUser = userRepository.save(user);
-        return userMapper.toResponseDto(updatedUser);
+        return userMapper.toResponseDto(userRepository.save(user));
     }
 
     @Transactional
