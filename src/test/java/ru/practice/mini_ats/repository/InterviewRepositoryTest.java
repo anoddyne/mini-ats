@@ -80,7 +80,6 @@ public class InterviewRepositoryTest {
 
         // Создаём резюме
         Resume resume = new Resume();
-        resume.setSummary("Interview test resume");
         resume.setUser(user);
         resume = resumeRepository.save(resume);
 
