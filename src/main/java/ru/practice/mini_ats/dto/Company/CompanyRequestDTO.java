@@ -11,8 +11,5 @@ public record CompanyRequestDTO(
         String name,
 
         @Size(max = 3000, message = "Описание компании слишком длинное (максимум 3000 символов)")
-        String description,
-
-        @URL(message = "Некорректный формат ссылки")
-        String logoUrl
+        String description
 ) {}

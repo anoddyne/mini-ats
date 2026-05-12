@@ -32,6 +32,9 @@ public class Company {
     @Column(name = "logo_url")
     private String logoUrl;
 
+    @Column(name = "file_name")
+    private String fileName;
+
     @ManyToMany
     @JoinTable(
             name = "company_recruiters",

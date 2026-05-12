@@ -5,31 +5,42 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.practice.mini_ats.dto.Company.CompanyRequestDTO;
 import ru.practice.mini_ats.dto.Company.CompanyResponseDTO;
 import ru.practice.mini_ats.mapper.CompanyMapper;
 import ru.practice.mini_ats.models.Company;
+import ru.practice.mini_ats.models.Resume;
 import ru.practice.mini_ats.models.User;
 import ru.practice.mini_ats.repositories.CompanyRepository;
 import ru.practice.mini_ats.repositories.UserRepository;
 import ru.practice.mini_ats.security.SecurityUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CompanyService {
+    private final FileService fileService;
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
     private final UserRepository userRepository;
 
     @Transactional
-    public CompanyResponseDTO createCompany(CompanyRequestDTO dto) {
+    public CompanyResponseDTO createCompany(CompanyRequestDTO dto, MultipartFile logo) {
         String login = SecurityUtils.getCurrentUserLogin();
-        User recruiter = userRepository.findByLogin(login).orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+        String fileName = fileService.uploadFile(logo, login, fileService.getCompanyBucketName());
+        String fileUrl = fileService.getPublicFileUrl(fileService.getCompanyBucketName(), fileName);
 
         Company company = companyMapper.toEntity(dto);
-        company.getRecruiters().add(recruiter);
+        company.setLogoUrl(fileUrl);
+        company.setFileName(fileName);
+        company.getRecruiters().add(user);
+
         return companyMapper.toResponseDto(companyRepository.save(company));
     }
 

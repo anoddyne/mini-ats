@@ -26,67 +26,81 @@ export default function CompaniesPage() {
   };
 
   const filteredCompanies = companies.filter(company =>
-    company.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      company.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (loading) {
+    return <div className="text-center py-12">Загрузка...</div>;
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">🏢 Компании</h1>
-        {user?.role === 'RECRUITER' && (
-          <Link
-            to="/companies/create"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            + Создать компанию
-          </Link>
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Компании</h1>
+          {user?.role === 'RECRUITER' && (
+              <Link to="/companies/create" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                + Создать компанию
+              </Link>
+          )}
+        </div>
+
+        {/* Поиск */}
+        <div className="mb-6">
+          <input
+              type="text"
+              placeholder="Поиск компаний..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {filteredCompanies.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">Компании не найдены</div>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCompanies.map((company) => (
+                  <div key={company.companyId} className="border rounded-lg p-4 hover:shadow transition bg-white">
+                    {/* Логотип */}
+                    <div className="flex justify-center mb-4">
+                      {company.logoUrl ? (
+                          <img
+                              src={company.logoUrl}
+                              alt={company.name}
+                              className="h-24 w-24 object-contain rounded-full"
+                              onError={(e) => e.target.style.display = 'none'} // Скрыть, если картинка не загрузилась
+                          />
+                      ) : (
+                          <div className="h-24 w-24 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
+                            📄
+                          </div>
+                      )}
+                    </div>
+
+                    {/* Информация */}
+                    <Link to={`/companies/${company.companyId}`} className="block">
+                      <h2 className="text-xl font-semibold text-center mb-2 hover:text-blue-600">
+                        {company.name}
+                      </h2>
+                    </Link>
+
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {company.description || 'Описание отсутствует'}
+                    </p>
+
+                    {/* Кнопка для перехода к вакансиям */}
+                    <div className="flex justify-center">
+                      <Link
+                          to={`/vacancies?companyId=${company.companyId}`}
+                          className="border border-blue-600 text-blue-600 px-4 py-1 rounded-md hover:bg-blue-50 transition"
+                      >
+                        Вакансии компании
+                      </Link>
+                    </div>
+                  </div>
+              ))}
+            </div>
         )}
       </div>
-
-      {/* Поиск */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Поиск компаний..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      {loading ? (
-        <div className="text-center py-12">Загрузка...</div>
-      ) : filteredCompanies.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-500 text-lg">😕 Компании не найдены</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCompanies.map((company) => (
-            <div key={company.companyId} className="bg-white rounded-lg shadow hover:shadow-lg transition p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">{company.name}</h2>
-                </div>
-                {user?.role === 'RECRUITER' && user.id === company.ownerId && (
-                  <Link
-                    to={`/companies/${company.id}/edit`}
-                    className="text-yellow-600 hover:text-yellow-700"
-                  >
-                    ✏️
-                  </Link>
-                )}
-              </div>
-              
-              {company.description && (
-                <p className="text-gray-600 text-sm mt-3 line-clamp-2">
-                  {company.description}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }

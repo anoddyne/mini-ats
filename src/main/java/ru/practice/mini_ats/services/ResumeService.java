@@ -2,7 +2,6 @@ package ru.practice.mini_ats.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,12 +36,12 @@ public class ResumeService {
         String fileName;
 
         if (resumeOptional.isPresent()) {
-            fileName = fileService.uploadFile(file, login);
-            fileService.deleteFile(fileName);
+            fileName = login + file.getOriginalFilename();
+            fileService.deleteFile(fileService.getResumeBucketName(), fileName);
         }
 
-        fileName = fileService.uploadFile(file, login);
-        String fileUrl = fileService.getPublicFileUrl(fileName);
+        fileName = fileService.uploadFile(file, login, fileService.getResumeBucketName());
+        String fileUrl = fileService.getPublicFileUrl(fileService.getResumeBucketName(), fileName);
 
         Resume resume = new Resume();
         resume.setUser(user);
@@ -59,7 +58,7 @@ public class ResumeService {
         Optional<Resume> resume = resumeRepository.findByUserUserId(user.getUserId());
         if (resume.isPresent()) {
             String fileName = login + resume.get().getFileName();
-            return fileService.downloadFile(fileName);
+            return fileService.downloadFile(fileService.getResumeBucketName(), fileName);
         }
         return null;
     }
@@ -75,7 +74,7 @@ public class ResumeService {
 
         String fileName = login + resume.getFileName();
 
-        fileService.deleteFile(fileName);
+        fileService.deleteFile(fileService.getResumeBucketName(), fileName);
 
         resumeRepository.deleteById(resume.getResumeId());
     }

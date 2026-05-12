@@ -2,19 +2,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Layout({ children }) {
-  const { user, logout: contextLogout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    contextLogout();
+    logout();
     navigate('/login');
   };
 
   const getDashboardLink = () => {
-    if (!user) return null;
-    if (user.role === 'CANDIDATE') return '/candidate/dashboard';
-    if (user.role === 'RECRUITER') return '/recruiter/dashboard';
-    return '/';
+    if (!user) return '/';
+    return user.role === 'CANDIDATE' ? '/candidate/dashboard' : '/recruiter/dashboard';
   };
 
   return (
@@ -27,17 +25,28 @@ export default function Layout({ children }) {
                   JobBoard
                 </Link>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
-                  <Link to="/" className="px-3 py-2 text-gray-700 hover:text-blue-600">
+                  <Link
+                      to="/companies"
+                      className="px-3 py-2 text-gray-700 hover:text-blue-600"
+                  >
+                    Компании
+                  </Link>
+                  <Link
+                      to="/"
+                      className="px-3 py-2 text-gray-700 hover:text-blue-600"
+                  >
                     Вакансии
                   </Link>
                   {user && (
-                      <Link to={getDashboardLink()} className="px-3 py-2 text-gray-700 hover:text-blue-600">
+                      <Link
+                          to={getDashboardLink()}
+                          className="px-3 py-2 text-gray-700 hover:text-blue-600"
+                      >
                         Личный кабинет
                       </Link>
                   )}
                 </div>
               </div>
-
               <div className="flex items-center space-x-4">
                 {user ? (
                     <>
@@ -71,7 +80,6 @@ export default function Layout({ children }) {
             </div>
           </div>
         </nav>
-
         <main>{children}</main>
       </div>
   );
