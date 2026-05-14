@@ -2,6 +2,7 @@ package ru.practice.mini_ats.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import ru.practice.mini_ats.security.SecurityUtils;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VacancyService {

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,7 @@ import ru.practice.mini_ats.services.VacancyService;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
-
+@Slf4j
 @Tag(name = "Vacancy Controller",description = "Обрабатывает запросы, связанные с вакансиями")
 @RestController
 @RequiredArgsConstructor

@@ -44,11 +44,6 @@ export default function ProfilePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (passwordData.newPassword && passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('Пароли не совпадают');
-      return;
-    }
-
     setLoading(true);
     try {
       const updateData = {

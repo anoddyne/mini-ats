@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import ru.practice.mini_ats.dto.ResumeReaction.ResumeReactionResponseDTO;
 import ru.practice.mini_ats.services.ResumeReactionService;
 
 import java.util.List;
-
+@Slf4j
 @Tag(name = "Resume reaction Controller",description = "Обрабатывает запросы, связанные с откликами резюме")
 @RestController
 @RequiredArgsConstructor

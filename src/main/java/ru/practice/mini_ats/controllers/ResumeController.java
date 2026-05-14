@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import ru.practice.mini_ats.dto.Resume.ResumeResponseDTO;
 import ru.practice.mini_ats.services.ResumeService;
 
 import java.io.InputStream;
-
+@Slf4j
 @Tag(name = "Resume Controller", description = "Обрабатывает запросы, связанные с резюме")
 @RestController
 @RequestMapping("/api/v1/resume")

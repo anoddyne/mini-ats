@@ -39,7 +39,6 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      # Используем имя сервиса minio, а не localhost!
       MINIO_URL: http://minio:9000
       MINIO_ROOT_USER: admin123
       MINIO_ROOT_PASSWORD: admin123

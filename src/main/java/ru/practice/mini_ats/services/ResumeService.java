@@ -2,6 +2,7 @@ package ru.practice.mini_ats.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +16,7 @@ import ru.practice.mini_ats.security.SecurityUtils;
 
 import java.io.InputStream;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResumeService {

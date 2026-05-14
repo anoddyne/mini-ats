@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import ru.practice.mini_ats.dto.Interview.InterviewResponseDTO;
 import ru.practice.mini_ats.services.InterviewService;
 
 import java.util.List;
-
+@Slf4j
 @Tag(name = "Interview Controller",description = "Обрабатывает запросы, связанные с интервью")
 @RestController
 @RequiredArgsConstructor
