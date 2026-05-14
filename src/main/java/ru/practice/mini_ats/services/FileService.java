@@ -96,8 +96,9 @@ public class FileService {
         }
     }
 
+    // костыль
     public String getPublicFileUrl(String bucketName, String fileName) {
-        return String.format("%s/%s/%s", minioEndpoint.replaceFirst("/$", ""), bucketName, fileName);
+        return String.format("%s/%s/%s", "http://localhost:9000", bucketName, fileName);
     }
     private void setPublicBucketPolicy(String bucketName) {
         try {
